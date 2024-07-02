@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { createTheme, MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
 const theme = createTheme({
   /** Put your mantine theme override here */
 });
@@ -26,11 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <MantineProvider theme={theme}>
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
-          {children}
-        </body>
-      </MantineProvider>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <MantineProvider>{children}</MantineProvider>
+      </body>
     </html>
   );
 }

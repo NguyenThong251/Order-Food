@@ -3,8 +3,7 @@ import Image from "next/image";
 // import styles from "./page.module.css";
 // import ButtonMain from "./components/Button";
 import { Button, Container } from "@mantine/core";
-import ButtonM from "./components/ui/ButtonFrom";
-import LoginForm from "./components/form/login-form";
+import LoginForm from "../../components/form/login-form";
 
 export default function Home() {
   return (
