@@ -1,17 +1,13 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Button } from "@mantine/core";
 
 interface ButtonProps {
-  children?: ReactNode;
-  variant?: "filled" | "outline" | "light" | "default" | "subtle";
+  children: ReactNode;
+  className?: string;
+  appName: string;
 }
 
-export const ButtonM = ({ children, variant }: ButtonProps) => {
-  return (
-    <Button variant={variant} color="red" size="md">
-      {children}
-    </Button>
-  );
+export const Button = ({ children, className }: ButtonProps) => {
+  return <button className={className}>{children}</button>;
 };
