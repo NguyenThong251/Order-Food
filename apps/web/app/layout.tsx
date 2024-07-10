@@ -1,9 +1,9 @@
+import "@mantine/core/styles.css";
+import { createTheme, MantineProvider } from "@repo/ui";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "./globals.css";
-import { createTheme, MantineProvider } from "@repo/ui";
-import "@mantine/core/styles.css";
 import HeaderMain from "./components/header/header-main";
+import "./globals.css";
 const theme = createTheme({});
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
