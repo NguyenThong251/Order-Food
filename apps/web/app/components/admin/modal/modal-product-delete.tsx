@@ -44,8 +44,7 @@ const ModalDeleteProduct: FC<ModalDeleteProductProps> = ({
   const handleDelete = async () => {
     try {
       const response = await request.delete(`/products/${productId}`);
-      console.log(productId);
-      console.log(response);
+
       if (response.status === 200) {
         setNotification({
           title: "Success",
