@@ -21,6 +21,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@mantine/carousel": "^7.11.2",
     "@mantine/core": "^7.11.0",
     "@mantine/dropzone": "^7.11.1",
     "@mantine/form": "^7.11.0",
@@ -34,6 +35,8 @@
     "@tiptap/starter-kit": "^2.4.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
+    "embla-carousel-react": "^7.1.0",
+    "framer-motion": "^11.3.2",
     "next-auth": "5.0.0-beta.19",
     "next-routes": "^1.4.2",
     "react": "^18.2.0",

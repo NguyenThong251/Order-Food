@@ -13,18 +13,20 @@ import {
   Text,
   Title,
 } from "@repo/ui";
+
 const CardOrderItem = () => {
   return (
     <>
       <Grid>
-        <Grid.Col span={3}>
+        <Grid.Col span={4}>
           <Image
+            className="h-20"
             radius="md"
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdzPwtTZ1F-BAHPEsZokFxgpJOLJ-g0WGDbA&s"
             alt="abc"
           />
         </Grid.Col>
-        <Grid.Col span={5}>
+        <Grid.Col span={6}>
           <Box>
             <Flex justify="space-between" align="center">
               <Title fz={16}>Phở 2</Title>
@@ -51,11 +53,13 @@ const CardOrderItem = () => {
             </Box>
           </Box>
         </Grid.Col>
-        <Grid.Col span={4}>
-          <Flex direction="column" align="center" justify="center">
-            <Button variant="filled" color="rgba(255, 0, 0, 1)">
-              <AiFillDelete />
-            </Button>
+        <Grid.Col span={2}>
+          <Flex align="end" justify="end">
+            <AiFillDelete
+              style={{ cursor: "pointer" }}
+              size={20}
+              color="rgba(255, 0, 0, 1)"
+            />
           </Flex>
         </Grid.Col>
       </Grid>
