@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { Button } from "@repo/ui/button";
+// import { Button } from "@repo/ui";
 import styles from "./page.module.css";
-
+import { Button } from "@repo/ui";
 export default function Home() {
   return (
     <div className={styles.page}>

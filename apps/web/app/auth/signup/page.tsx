@@ -1,5 +1,5 @@
 import Image from "next/image";
-// import { ButtonMain } from "@repo/ui/button";
+// import { ButtonMain } from "@repo/ui";
 // import styles from "./page.module.css";
 // import ButtonMain from "./components/Button";
 import { Container } from "@repo/ui";
