@@ -35,7 +35,6 @@ export default function page() {
     try {
       const res = await request.get("/products");
       setData(res.data);
-      console.log(res.data);
     } catch (err) {
       console.error("Error fetching products:", err);
     } finally {
@@ -56,11 +55,15 @@ export default function page() {
           {data.map((item) => (
             <Grid.Col key={item._id} span={{ base: 12, md: 6, lg: 4, xl: 3 }}>
               <CardProduct
-                image={item.thumbnails[0] || "default-image-url.jpg"}
+                image={
+                  item.thumbnails[0] ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
+                }
                 name={item.name}
                 price={item.price}
                 description={item.description}
                 seller={item.seller}
+                productId={item._id}
               />
             </Grid.Col>
           ))}

@@ -8,15 +8,13 @@ export * from "react-icons/fi";
 export * from "react-icons/md";
 export * from "@tabler/icons-react";
 export * from "@mantine/dropzone";
-// export * from "@mantine/tiptap";
-// export * from "@tiptap/react";
-// export * from "@tiptap/pm";
-// export * from "@tiptap/starter-kit";
-// export * from "@tiptap/extension-link";
+export { motion } from "framer-motion";
+export { Carousel } from "@mantine/carousel";
+export { persist, devtools } from "zustand/middleware";
+// export {motio} from "framer-motion";
 
 export * from "@mantine/form";
 export * from "zustand";
-// export * from "zustand/middleware";
 
 import bcrypt from "bcryptjs";
 export { bcrypt };

@@ -10,6 +10,7 @@ export default function Home() {
     <>
       <Container size="xl">
         <Button>123</Button>
+        <h2 className="text-red-500">123</h2>
       </Container>
     </>
   );

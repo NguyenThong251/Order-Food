@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Box,
   Container,
+  Flex,
   Group,
   IconSearch,
   Tabs,
@@ -44,18 +45,21 @@ export function Header() {
         </Group>
       </Container>
       <Container size="md">
-        <Tabs
-          defaultValue="All Categories"
-          variant="outline"
-          visibleFrom="sm"
-          classNames={{
-            root: classes.tabs,
-            list: classes.tabsList,
-            tab: classes.tab,
-          }}
-        >
-          <Tabs.List>{items}</Tabs.List>
-        </Tabs>
+        <Flex align="center" justify="space-between">
+          <Tabs
+            defaultValue="All Categories"
+            variant="outline"
+            visibleFrom="sm"
+            classNames={{
+              root: classes.tabs,
+              list: classes.tabsList,
+              tab: classes.tab,
+            }}
+          >
+            <Tabs.List>{items}</Tabs.List>
+          </Tabs>
+          <Box>fillter</Box>
+        </Flex>
       </Container>
     </Box>
   );

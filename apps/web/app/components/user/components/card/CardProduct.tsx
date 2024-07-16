@@ -1,39 +1,28 @@
 "use client";
 import {
+  AiOutlinePlus,
   Badge,
+  Box,
   Button,
   Card,
-  Container,
-  Grid,
+  Flex,
   Group,
   Image,
   Text,
-  NumberInput,
-  useEffect,
-  useState,
-  AiOutlineMinus,
-  AiOutlinePlus,
-  Box,
-  Flex,
   rem,
-  TextInput,
   useDisclosure,
-  Modal,
-  AiOutlineClose,
-  SimpleGrid,
+  useState,
+  motion,
 } from "@repo/ui";
+import request from "../../../../utils/request";
 import ProductModal from "../../modal/modal-product";
-const images = [
-  "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-1.png",
-  "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-2.png",
-  "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-3.png",
-];
 interface CardProductProps {
   image: String;
   name: string;
   price: string;
   description: string;
   seller: number;
+  productId: string;
 }
 const CardProduct: React.FC<CardProductProps> = ({
   image,
@@ -41,11 +30,18 @@ const CardProduct: React.FC<CardProductProps> = ({
   price,
   description,
   seller,
+  productId,
 }) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [product, setProduct] = useState<any>(null);
+  const handleOpen = async () => {
+    const response = await request.get(`/products/${productId}`);
+    setProduct(response.data[0]);
+    open();
+  };
   return (
     <>
-      <ProductModal opened={opened} onClose={close} />
+      <ProductModal opened={opened} onClose={close} product={product} />
       <Card
         padding={0}
         shadow="sm"
@@ -61,13 +57,21 @@ const CardProduct: React.FC<CardProductProps> = ({
               right: rem(8),
               zIndex: 1,
             }}
-            color="red"
+            color="green"
           >
             Seller
           </Badge>
         )}
-        <Card.Section component="a" href="https://mantine.dev/">
-          <Image src={image} height={160} alt="Norway" />
+        <Card.Section component="a">
+          <Image
+            className="h-40"
+            src={
+              image !== ""
+                ? image
+                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
+            }
+            alt={name}
+          />
         </Card.Section>
         <Box p="xs">
           <Group justify="space-between" mb="xs">
@@ -80,65 +84,24 @@ const CardProduct: React.FC<CardProductProps> = ({
             Price: {price} VNĐ
           </Text>
           <Box mt="md">
-            {/* <Flex justify="space-between" align="center">
-              <Button
-                color="red"
-                style={{
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: rem(40),
-                  height: rem(40),
-                }}
-              >
-                <AiOutlineMinus size={20} />
-              </Button>
-              <TextInput
-                value={1}
-                min={0}
-                max={99}
-                step={1}
-                styles={{
-                  input: {
-                    width: rem(60),
-                    textAlign: "center",
-                    border: "none",
-                    outline: "none",
-                    boxShadow: "none",
-                    fontSize: rem(16),
-                  },
-                }}
-              />
-              <Button
-                color="red"
-                style={{
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: rem(40),
-                  height: rem(40),
-                }}
-              >
-                <AiOutlinePlus size={10} />
-              </Button>
-            </Flex> */}
             <Flex justify="end" align="center">
-              <Button
-                color="red"
-                style={{
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: rem(40),
-                  height: rem(40),
-                }}
-                onClick={open}
-              >
-                <AiOutlinePlus size={20} />
-              </Button>
+              <motion.button whileTap={{ scale: 0.97 }}>
+                <Button
+                  color="red"
+                  style={{
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: rem(40),
+                    height: rem(40),
+                  }}
+                  // onClick={open}
+                  onClick={handleOpen}
+                >
+                  <AiOutlinePlus size={20} />
+                </Button>
+              </motion.button>
             </Flex>
           </Box>
         </Box>

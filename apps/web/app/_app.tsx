@@ -1,5 +1,5 @@
 import "@mantine/core/styles.css";
-
+import "./globals.css";
 import type { AppProps } from "next/app";
 // import { createTheme, MantineProvider } from "@mantine/core";
 import { createTheme, MantineProvider } from "@repo/ui";
