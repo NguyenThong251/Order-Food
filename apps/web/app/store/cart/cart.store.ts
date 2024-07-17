@@ -23,6 +23,12 @@ export const useCartStore = create<CartState>()(
             }
             return { items: newItems };
           }),
+        updateItemQuantity: (product_id, quantity) =>
+          set((state) => ({
+            items: state.items.map((item) =>
+              item.product_id === product_id ? { ...item, quantity } : item
+            ),
+          })),
         removeItem: (productId) =>
           set((state) => ({
             items: state.items.filter((item) => item.product_id !== productId),

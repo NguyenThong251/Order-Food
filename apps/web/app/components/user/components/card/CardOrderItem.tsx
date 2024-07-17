@@ -13,32 +13,62 @@ import {
   Text,
   Title,
 } from "@repo/ui";
+import { Products } from "../../../../interface";
+interface CardOrderItemProps {
+  product: Products;
+  quantity: number;
+  onRemove: (productId: string) => void;
+  onUpdateQuantity: (productId: string, quantity: number) => void;
+}
 
-const CardOrderItem = () => {
+const CardOrderItem: React.FC<CardOrderItemProps> = ({
+  product,
+  quantity,
+  onRemove,
+  onUpdateQuantity,
+}) => {
+  const handleUpdateQuantity = (newQuantity: number) => {
+    if (newQuantity < 1) {
+      onRemove(product._id);
+    } else {
+      onUpdateQuantity(product._id, newQuantity);
+    }
+  };
+  // console.log(product);
   return (
     <>
       <Grid>
         <Grid.Col span={4}>
-          <Image
-            className="h-20"
-            radius="md"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdzPwtTZ1F-BAHPEsZokFxgpJOLJ-g0WGDbA&s"
-            alt="abc"
-          />
+          <div>
+            <Image
+              w={100}
+              h={100}
+              radius="md"
+              src={
+                product.thumbnails[0] ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
+              }
+              alt={product.name}
+            />
+          </div>
         </Grid.Col>
         <Grid.Col span={6}>
           <Box>
             <Flex justify="space-between" align="center">
-              <Title fz={16}>Phở 2</Title>
-              <Text>Category</Text>
+              <Title fz={16}>{product.name}</Title>
+              <Text>{product.category.name}</Text>
             </Flex>
-            <Text>Price:123.000VNĐ</Text>
+            <Text>Price:{product.price}VNĐ</Text>
             <Box>
               <Flex align="center">
-                <AiOutlineMinus size={20} style={{ cursor: "pointer" }} />
+                <AiOutlineMinus
+                  size={20}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleUpdateQuantity(quantity - 1)}
+                />
 
                 <NumberInput
-                  value={1}
+                  value={quantity}
                   hideControls
                   styles={{
                     input: {
@@ -47,8 +77,13 @@ const CardOrderItem = () => {
                       width: 60,
                     },
                   }}
+                  onChange={(value) => handleUpdateQuantity(Number(value))}
                 />
-                <AiOutlinePlus size={20} style={{ cursor: "pointer" }} />
+                <AiOutlinePlus
+                  size={20}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleUpdateQuantity(quantity + 1)}
+                />
               </Flex>
             </Box>
           </Box>
@@ -59,6 +94,7 @@ const CardOrderItem = () => {
               style={{ cursor: "pointer" }}
               size={20}
               color="rgba(255, 0, 0, 1)"
+              onClick={() => onRemove(product._id)}
             />
           </Flex>
         </Grid.Col>

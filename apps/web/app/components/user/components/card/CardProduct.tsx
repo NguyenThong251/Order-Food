@@ -37,6 +37,7 @@ const CardProduct: React.FC<CardProductProps> = ({
   const handleOpen = async () => {
     const response = await request.get(`/products/${productId}`);
     setProduct(response.data[0]);
+    // console.log(response.data[0]);
     open();
   };
   return (

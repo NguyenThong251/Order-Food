@@ -1,41 +1,31 @@
-import React from "react";
+import "@mantine/carousel/styles.css";
 import {
+  AiOutlineMinus,
+  AiOutlinePlus,
+  Badge,
   Box,
   Button,
   Card,
-  Image,
-  Group,
-  Text,
-  Badge,
-  SimpleGrid,
-  Modal,
-  Flex,
-  rem,
-  TextInput,
-  AiOutlineMinus,
-  AiOutlinePlus,
-  motion,
   Carousel,
+  Flex,
+  Group,
+  Image,
+  Modal,
+  Text,
+  TextInput,
+  motion,
+  rem,
   useState,
 } from "@repo/ui";
-import "@mantine/carousel/styles.css";
+import React from "react";
 import { AiOutlineClose } from "react-icons/ai";
+import { CartItem, Products } from "../../../interface";
 import { useCartStore } from "../../../store";
 
 interface ProductModalProps {
   opened: boolean;
   onClose: () => void;
-  product: {
-    name: string;
-    price: number;
-    description: string;
-    seller: number;
-    category: {
-      name: string;
-      image: string;
-    };
-    thumbnails: string[];
-  } | null;
+  product: Products | null;
 }
 const modalVariants = {
   hidden: { opacity: 0, y: "-100%" },
@@ -53,11 +43,18 @@ const ProductModal: React.FC<ProductModalProps> = ({
 }) => {
   if (!product) return null;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { items, addItem, removeItem, clearCart } = useCartStore(
-    (state) => state
-  );
-  const handleAddToCart = () => {};
+  const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCartStore((state) => state);
+  const handleAddToCart = () => {
+    const newItem: CartItem = { product_id: product._id, quantity };
+    addItem(newItem);
+
+    onClose();
+  };
+  console.log(product);
   // const productItem = product
+  // xử lý price button
+  const totalPrice = product.price * quantity;
   return (
     <Modal
       padding={0}
@@ -139,14 +136,19 @@ const ProductModal: React.FC<ProductModalProps> = ({
                     width: rem(40),
                     height: rem(40),
                   }}
+                  onClick={() => {
+                    if (quantity > 0) setQuantity(quantity - 1);
+                  }}
                 >
                   <AiOutlineMinus size={20} />
                 </Button>
                 <TextInput
-                  value={1}
-                  min={0}
-                  max={99}
-                  step={1}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value)) {
+                      setQuantity(value);
+                    }
+                  }}
                   styles={{
                     input: {
                       width: rem(60),
@@ -157,8 +159,16 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       fontSize: rem(16),
                     },
                   }}
+                  value={quantity}
+                  min={0}
+                  max={99}
+                  step={1}
+                  className="w-20 border-0 outline-none "
                 />
                 <Button
+                  onClick={() => {
+                    if (quantity < 99) setQuantity(quantity + 1);
+                  }}
                   variant="outline"
                   color="red"
                   style={{
@@ -175,14 +185,17 @@ const ProductModal: React.FC<ProductModalProps> = ({
               </Flex>
             </Box>
           </Flex>
+
           <Button
-            onClick={handleAddToCart}
+            onClick={quantity === 0 ? onClose : handleAddToCart}
             color="red"
             fullWidth
             mt="md"
             radius="md"
           >
-            Add to cart - {product.price}VNĐ
+            {quantity !== 0
+              ? `Add to cart - ${totalPrice.toLocaleString()} VNĐ`
+              : "Quay lại trang chủ"}
           </Button>
         </Card>
       </motion.div>
