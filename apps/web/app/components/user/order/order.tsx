@@ -41,11 +41,20 @@ const Order: React.FC = () => {
       setLoading(false);
     }
   };
-
+  const Tableid = "6699cf7e672871bd55d13b1d";
+  const fetchDataTable = async () => {
+    const res = await request.get(`table/${Tableid}`);
+    console.log(res.data);
+  };
   useEffect(() => {
+    fetchDataTable();
     fetchDataProducts();
+  }, [items]);
+  useEffect(() => {
+    // fetchDataProducts();
     setIsInputFilled(
-      phone.length >= 9 && name.trim() !== "" && productData.length > 0
+      // phone.length >= 9 && name.trim() !== "" &&
+      productData.length > 0
     );
   }, [items, phone, name, productData]);
   if (loading) {
@@ -55,14 +64,10 @@ const Order: React.FC = () => {
   const handleOpen = async () => {
     open();
   };
-  // useEffect(() => {
-  //   // Kiểm tra điều kiện để enable/disable nút Order
-  // }, [phone, name, productData]);
-  const handlePhoneChange = (value: string | number) => {
-    const phoneNumber = typeof value === "string" ? value : value.toString();
-    setPhone(phoneNumber);
-  };
 
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(event.target.value);
+  };
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
@@ -97,9 +102,9 @@ const Order: React.FC = () => {
           <Box>
             <Box>
               <Flex justify="space-between">
-                <Title fz={18}> Order No:</Title>
+                <Title fz={18}> Table:</Title>
                 <Flex align="center" gap={5}>
-                  <Text>#000230</Text>
+                  <Text>#A</Text>
                   {/* onClick={clearCart} */}
                   <AiOutlineDelete
                     onClick={handleOpen}
@@ -109,30 +114,26 @@ const Order: React.FC = () => {
                 </Flex>
               </Flex>
               <Flex gap={5}>
-                <NumberInput
+                <TextInput
                   label="Phone"
                   placeholder="Number Phone"
                   value={phone}
-                  error={phone.length! <= 8 ? "Please enter your name" : ""}
                   onChange={handlePhoneChange}
                   inputWrapperOrder={["label", "input", "error"]}
                 />
+                {/* error={phone.length! <= 9 ? "Please enter your phone" : ""} */}
                 <TextInput
                   label="Your name"
                   placeholder="Your name"
                   value={name}
-                  error={name.trim() === "" ? "Please enter your name" : ""}
                   inputWrapperOrder={["label", "input", "error"]}
                   onChange={handleNameChange}
                 />
+                {/* error={name.trim() === "" ? "Please enter your name" : ""} */}
               </Flex>
             </Box>
           </Box>
-          {/* <Image
-              w={180}
-              src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-7359557-6024626.png"
-              alt="cart null"
-            ></Image> */}
+
           <Flex gap={20} align="center" justify="center" direction="column">
             {productData.length === 0 ? (
               <Image
