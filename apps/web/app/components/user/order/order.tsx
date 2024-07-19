@@ -15,20 +15,35 @@ import {
 } from "@repo/ui";
 import classes from "./order.module.css";
 import CardOrderItem from "../components/card/CardOrderItem";
-import { useCartStore } from "../../../store";
+import { useCartStore, useOrderStore, useTableStore } from "../../../store";
 import ModalDialogs from "../modal/modal-dialogs";
 import request from "../../../utils/request";
-import { Products } from "../../../interface";
+import { OrderData, Products, Table } from "../../../interface";
+
+// interface OrderItem {
+//   product_id: number;
+//   quantity: number;
+// }
+
+interface User {
+  id: number;
+  name: string;
+  phone: string;
+}
 const Order: React.FC = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const { items, clearCart, removeItem, updateItemQuantity } = useCartStore(
     (state) => state
   );
+  const { orderId, setOrderId } = useOrderStore((state) => state);
   const [loading, setLoading] = useState(true);
   const [productData, setProductData] = useState<Products[]>([]);
   const [phone, setPhone] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [isInputFilled, setIsInputFilled] = useState(false);
+  const [tableData, setTableData] = useState<Table | null>(null);
+  const tableId = useTableStore((state) => state._id);
+  const [user, setUser] = useState<User | null>(null);
   const fetchDataProducts = async () => {
     try {
       const res = await Promise.all(
@@ -41,10 +56,10 @@ const Order: React.FC = () => {
       setLoading(false);
     }
   };
-  const Tableid = "6699cf7e672871bd55d13b1d";
   const fetchDataTable = async () => {
-    const res = await request.get(`table/${Tableid}`);
-    console.log(res.data);
+    const res = await request.get(`table/${tableId}`);
+    setTableData(res.data);
+    // console.log(res.data);
   };
   useEffect(() => {
     fetchDataTable();
@@ -72,15 +87,31 @@ const Order: React.FC = () => {
     setName(event.target.value);
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     // Xử lý khi nhấn Order, có thể đặt logic lưu đơn hàng và các thao tác cần thiết ở đây
-    console.log(
-      "Order placed with phone:",
-      phone,
-      "and name:",
-      name,
-      productData
-    );
+    // phone,
+    //   name,
+    const orderData: OrderData = {
+      user_id: user ? user?.id : null,
+      products: items.map((item) => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+      })),
+      // productData: [],
+      table_id: tableId,
+      sub_total: totalPrice,
+    };
+    try {
+      const res = await request.post("/order", orderData);
+      if (res.status === 201) {
+        if (!user) {
+          setOrderId(res.data._id);
+        }
+        clearCart();
+      }
+    } catch (err) {
+      console.error("Error ordering:", err);
+    }
   };
   // xử lý tổng quantity
   const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -104,7 +135,7 @@ const Order: React.FC = () => {
               <Flex justify="space-between">
                 <Title fz={18}> Table:</Title>
                 <Flex align="center" gap={5}>
-                  <Text>#A</Text>
+                  <Text>{tableData?.name}</Text>
                   {/* onClick={clearCart} */}
                   <AiOutlineDelete
                     onClick={handleOpen}

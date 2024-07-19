@@ -12,7 +12,6 @@ export { motion } from "framer-motion";
 export { Carousel } from "@mantine/carousel";
 export { persist, devtools } from "zustand/middleware";
 // export {motio} from "framer-motion";
-
 export * from "@mantine/form";
 export * from "zustand";
 

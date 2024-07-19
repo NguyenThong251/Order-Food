@@ -15,7 +15,6 @@ export default function page() {
     try {
       const res = await request.get("/categories");
       setData(res.data);
-      console.log(res.data);
     } catch (err) {
       console.error("Error fetching products:", err);
     } finally {
