@@ -1,0 +1,16 @@
+export interface OrderProduct {
+  product_id: string;
+  quantity: number;
+}
+
+export interface OrderData {
+  user_id: number | null;
+  products: OrderProduct[];
+  table_id: string;
+  sub_total: number;
+}
+
+export interface OrderState {
+  orderId: string;
+  setOrderId: (id: string) => void;
+}

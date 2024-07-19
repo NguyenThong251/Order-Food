@@ -15,20 +15,35 @@ import {
 } from "@repo/ui";
 import classes from "./order.module.css";
 import CardOrderItem from "../components/card/CardOrderItem";
-import { useCartStore } from "../../../store";
+import { useCartStore, useOrderStore, useTableStore } from "../../../store";
 import ModalDialogs from "../modal/modal-dialogs";
 import request from "../../../utils/request";
-import { Products } from "../../../interface";
+import { OrderData, Products, Table } from "../../../interface";
+
+// interface OrderItem {
+//   product_id: number;
+//   quantity: number;
+// }
+
+interface User {
+  id: number;
+  name: string;
+  phone: string;
+}
 const Order: React.FC = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const { items, clearCart, removeItem, updateItemQuantity } = useCartStore(
     (state) => state
   );
+  const { orderId, setOrderId } = useOrderStore((state) => state);
   const [loading, setLoading] = useState(true);
   const [productData, setProductData] = useState<Products[]>([]);
   const [phone, setPhone] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [isInputFilled, setIsInputFilled] = useState(false);
+  const [tableData, setTableData] = useState<Table | null>(null);
+  const tableId = useTableStore((state) => state._id);
+  const [user, setUser] = useState<User | null>(null);
   const fetchDataProducts = async () => {
     try {
       const res = await Promise.all(
@@ -41,11 +56,20 @@ const Order: React.FC = () => {
       setLoading(false);
     }
   };
-
+  const fetchDataTable = async () => {
+    const res = await request.get(`table/${tableId}`);
+    setTableData(res.data);
+    // console.log(res.data);
+  };
   useEffect(() => {
+    fetchDataTable();
     fetchDataProducts();
+  }, [items]);
+  useEffect(() => {
+    // fetchDataProducts();
     setIsInputFilled(
-      phone.length >= 9 && name.trim() !== "" && productData.length > 0
+      // phone.length >= 9 && name.trim() !== "" &&
+      productData.length > 0
     );
   }, [items, phone, name, productData]);
   if (loading) {
@@ -55,27 +79,39 @@ const Order: React.FC = () => {
   const handleOpen = async () => {
     open();
   };
-  // useEffect(() => {
-  //   // Kiểm tra điều kiện để enable/disable nút Order
-  // }, [phone, name, productData]);
-  const handlePhoneChange = (value: string | number) => {
-    const phoneNumber = typeof value === "string" ? value : value.toString();
-    setPhone(phoneNumber);
-  };
 
+  const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(event.target.value);
+  };
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     // Xử lý khi nhấn Order, có thể đặt logic lưu đơn hàng và các thao tác cần thiết ở đây
-    console.log(
-      "Order placed with phone:",
-      phone,
-      "and name:",
-      name,
-      productData
-    );
+    // phone,
+    //   name,
+    const orderData: OrderData = {
+      user_id: user ? user?.id : null,
+      products: items.map((item) => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+      })),
+      // productData: [],
+      table_id: tableId,
+      sub_total: totalPrice,
+    };
+    try {
+      const res = await request.post("/order", orderData);
+      if (res.status === 201) {
+        if (!user) {
+          setOrderId(res.data._id);
+        }
+        clearCart();
+      }
+    } catch (err) {
+      console.error("Error ordering:", err);
+    }
   };
   // xử lý tổng quantity
   const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -97,9 +133,9 @@ const Order: React.FC = () => {
           <Box>
             <Box>
               <Flex justify="space-between">
-                <Title fz={18}> Order No:</Title>
+                <Title fz={18}> Table:</Title>
                 <Flex align="center" gap={5}>
-                  <Text>#000230</Text>
+                  <Text>{tableData?.name}</Text>
                   {/* onClick={clearCart} */}
                   <AiOutlineDelete
                     onClick={handleOpen}
@@ -109,30 +145,26 @@ const Order: React.FC = () => {
                 </Flex>
               </Flex>
               <Flex gap={5}>
-                <NumberInput
+                <TextInput
                   label="Phone"
                   placeholder="Number Phone"
                   value={phone}
-                  error={phone.length! <= 8 ? "Please enter your name" : ""}
                   onChange={handlePhoneChange}
                   inputWrapperOrder={["label", "input", "error"]}
                 />
+                {/* error={phone.length! <= 9 ? "Please enter your phone" : ""} */}
                 <TextInput
                   label="Your name"
                   placeholder="Your name"
                   value={name}
-                  error={name.trim() === "" ? "Please enter your name" : ""}
                   inputWrapperOrder={["label", "input", "error"]}
                   onChange={handleNameChange}
                 />
+                {/* error={name.trim() === "" ? "Please enter your name" : ""} */}
               </Flex>
             </Box>
           </Box>
-          {/* <Image
-              w={180}
-              src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-7359557-6024626.png"
-              alt="cart null"
-            ></Image> */}
+
           <Flex gap={20} align="center" justify="center" direction="column">
             {productData.length === 0 ? (
               <Image

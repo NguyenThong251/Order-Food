@@ -19,7 +19,7 @@ import ProductModal from "../../modal/modal-product";
 interface CardProductProps {
   image: String;
   name: string;
-  price: string;
+  price: number;
   description: string;
   seller: number;
   productId: string;

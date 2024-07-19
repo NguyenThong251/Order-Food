@@ -120,6 +120,9 @@ importers:
       next-auth:
         specifier: 5.0.0-beta.19
         version: 5.0.0-beta.19(next@15.0.0-rc.0(react-dom@19.0.0-rc-f994737d14-20240522(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522)
+      next-routes:
+        specifier: ^1.4.2
+        version: 1.4.2(next@15.0.0-rc.0(react-dom@19.0.0-rc-f994737d14-20240522(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522)
       npm:
         specifier: ^10.8.1
         version: 10.8.1
@@ -6748,6 +6751,12 @@ snapshots:
       next: 15.0.0-rc.0(react-dom@19.0.0-rc-f994737d14-20240522(react@18.2.0))(react@18.2.0)
       path-to-regexp: 2.4.0
       react: 18.2.0
+
+  next-routes@1.4.2(next@15.0.0-rc.0(react-dom@19.0.0-rc-f994737d14-20240522(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522):
+    dependencies:
+      next: 15.0.0-rc.0(react-dom@19.0.0-rc-f994737d14-20240522(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522)
+      path-to-regexp: 2.4.0
+      react: 19.0.0-rc-f994737d14-20240522
 
   next@15.0.0-rc.0(react-dom@19.0.0-rc-f994737d14-20240522(react@18.2.0))(react@18.2.0):
     dependencies:

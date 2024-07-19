@@ -2,10 +2,12 @@ import { useDisclosure } from "@mantine/hooks";
 import {
   Autocomplete,
   Box,
+  Button,
   Container,
   Flex,
   Group,
   IconSearch,
+  NumberInput,
   Tabs,
   Text,
   rem,
@@ -58,7 +60,15 @@ export function Header() {
           >
             <Tabs.List>{items}</Tabs.List>
           </Tabs>
-          <Box>fillter</Box>
+          <Box>
+            <Flex align="end" gap={5}>
+              <NumberInput label="From Price" />
+              <NumberInput label="To Price" />
+              <Button variant="filled" color="red">
+                Filter
+              </Button>
+            </Flex>
+          </Box>
         </Flex>
       </Container>
     </Box>
