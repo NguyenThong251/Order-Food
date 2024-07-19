@@ -102,13 +102,26 @@ const Order: React.FC = () => {
       sub_total: totalPrice,
     };
     try {
-      const res = await request.post("/order", orderData);
-      if (res.status === 201) {
-        if (!user) {
-          setOrderId(res.data._id);
+      if (orderId) {
+        const currentOrder = await request.get(`/order/${orderId}`);
+        const updatedProducts = [
+          ...currentOrder.data.products,
+          ...orderData.products,
+        ];
+        await request.put(`/order/${orderId}`, {
+          ...currentOrder.data,
+          products: updatedProducts,
+          sub_total: currentOrder.data.sub_total + totalPrice,
+        });
+      } else {
+        const res = await request.post("/order", orderData);
+        if (res.status === 201) {
+          if (!user) {
+            setOrderId(res.data._id);
+          }
         }
-        clearCart();
       }
+      clearCart();
     } catch (err) {
       console.error("Error ordering:", err);
     }

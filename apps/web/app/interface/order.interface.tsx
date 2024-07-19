@@ -11,6 +11,7 @@ export interface OrderData {
 }
 
 export interface OrderState {
-  orderId: string;
+  orderId: string | null;
   setOrderId: (id: string) => void;
+  clearOrderId: () => void;
 }
