@@ -8,7 +8,11 @@ export * from "react-icons/fi";
 export * from "react-icons/md";
 export * from "@tabler/icons-react";
 export * from "@mantine/dropzone";
-export { motion } from "framer-motion";
+export * from "@radix-ui/react-slot";
+export * from "class-variance-authority";
+export * from "tailwind-merge";
+
+export { motion, useScroll, useMotionValueEvent } from "framer-motion";
 export { Carousel } from "@mantine/carousel";
 export { persist, devtools } from "zustand/middleware";
 // export {motio} from "framer-motion";
