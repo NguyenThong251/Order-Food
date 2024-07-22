@@ -19,8 +19,9 @@ import {
 } from "@repo/ui";
 import React from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { CartItem, Products } from "../../../interface";
-import { useCartStore } from "../../../store";
+import { CartItem, Products } from "../../../../interface";
+import { useCartStore } from "../../../../store";
+
 
 interface ProductModalProps {
   opened: boolean;

@@ -5,26 +5,30 @@
 // import { Button, Container } from "@mantine/core";
 import { Button, Container } from "@repo/ui";
 import Link from "next/link";
-import Navbar from "./components/users/components/Navbar";
-import { Footer } from "./components/users/components/Footer";
-import { Hero } from "./components/users/components/Hero";
+import Navbar from "./components/client/pages/Header";
+import { Footer } from "./components/client/pages/Footer";
+import { Hero } from "./components/client/pages/Hero";
+
 // import { Container } from "@mantine/core";
 
 export default function Home() {
   return (
     <>
+    <div className="bg-slate-50">
+      
       <Navbar />
-      <main className="mt-[calc(16px+56px)] ">
+      <main className=" ">
         <Hero />
-        <Hero />
+        
         {/* <Container size="xl">
         <Button>
-          <Link href={"/menu/product"}> 123</Link>
+        <Link href={"/menu/product"}> 123</Link>
         </Button>
         <h2 className="text-red-500">123</h2>
-      </Container> */}
+        </Container> */}
       </main>
       <Footer />
+        </div>
     </>
   );
 }

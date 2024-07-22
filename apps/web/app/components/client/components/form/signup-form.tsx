@@ -19,7 +19,7 @@ import {
   useState,
   bcrypt,
 } from "@repo/ui";
-import request from "../../utils/request";
+import request from "../../../../utils/request";
 
 const SignupForm = () => {
   const [notification, setNotification] = useState<{

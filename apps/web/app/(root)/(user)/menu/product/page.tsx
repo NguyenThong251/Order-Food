@@ -12,9 +12,9 @@ import {
   useEffect,
   useState,
 } from "@repo/ui";
-import CardProduct from "../../../../components/user/components/card/CardProduct";
 import request from "../../../../utils/request";
 import { Category, Products } from "../../../../interface";
+import CardProduct from "../../../../components/client/components/ui/CardProduct";
 
 export default function Page() {
   const [data, setData] = useState<Products[]>([]);

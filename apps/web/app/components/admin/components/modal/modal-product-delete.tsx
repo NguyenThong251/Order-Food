@@ -15,7 +15,7 @@ import {
   useEffect,
   Notification,
 } from "@repo/ui";
-import request from "../../../utils/request";
+import request from "../../../../utils/request";
 
 interface ModalDeleteProductProps {
   productId: number;

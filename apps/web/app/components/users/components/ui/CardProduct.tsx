@@ -15,7 +15,8 @@ import {
   motion,
 } from "@repo/ui";
 import request from "../../../../utils/request";
-import ProductModal from "../../modal/modal-product";
+import React from "react";
+import ProductModal from "../../../client/components/modal/modal-product";
 interface CardProductProps {
   image: String;
   name: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "./ui/button";
+// import { Button } from "./ui/Button";
 import {
   AiFillCaretDown,
   AiFillCaretUp,
@@ -11,6 +11,7 @@ import {
   useState,
 } from "@repo/ui";
 import Link from "next/link";
+import { Button } from "../components/ui/Button";
 
 export default function Navbar() {
   const [showNav, setShowNav] = useState<boolean>(false);
@@ -31,7 +32,7 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      className={`fixed inset-0 top-4 w-[95%] sm:w-[90%] mx-auto bg-primary font-medium text-dark-50 flex  max-sm:justify-between gap-4 px-3 max-w-7xl items-center rounded-full font-mono h-14 p-5 overflow-hidden `}
+      className={`bg-stone-100 shadow-lg fixed inset-0 top-4 w-[95%] sm:w-[90%] mx-auto bg-primary font-medium text-dark-50 flex  max-sm:justify-between gap-4 px-3 max-w-7xl items-center rounded-full font-mono h-14 p-5 overflow-hidden `}
       variants={{
         long: { maxWidth: 950 },
         short: { maxWidth: 280 },
@@ -91,14 +92,12 @@ export default function Navbar() {
         ]}
       >
         <li>
-          <Link href={"#about"}>{"//About"}</Link>
+          <Link href={"./menu/category"}>{"Category"}</Link>
         </li>
         <li>
-          <Link href={"#skills"}>{"//Skills"}</Link>
+          <Link href={"./menu/product"}>{"Product"}</Link>
         </li>
-        <li>
-          <Link href={"#projects"}>{"//Projects"}</Link>
-        </li>
+        
       </motion.ul>
 
       <motion.div
@@ -116,9 +115,12 @@ export default function Navbar() {
         initial="hidden"
         animate={hidden ? "visible" : "hidden"}
       >
+        <Link href="./menu/category">
         <Button variant={"accent"} className="w-full">
-          Contact
+          
+          Order Now
         </Button>
+        </Link>
       </motion.div>
 
       <Button

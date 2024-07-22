@@ -3,13 +3,14 @@ import Image from "next/image";
 // import styles from "./page.module.css";
 // import ButtonMain from "./components/Button";
 import { Container } from "@repo/ui";
-import SignupForm from "../../components/form/signup-form";
+import { RegisterForm } from "../../components/client/pages/RegisterForm";
+// import SignupForm from "../../components/form/signup-form";
 
 export default function Home() {
   return (
     <>
       <Container size="xl">
-        <SignupForm />
+        <RegisterForm />
       </Container>
     </>
   );
