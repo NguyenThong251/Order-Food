@@ -20,7 +20,7 @@ import {
   bcrypt,
 } from "@repo/ui";
 import { useRouter } from "next/navigation";
-import request from "../../utils/request";
+import request from "../../../../utils/request";
 
 const LoginForm = () => {
   const router = useRouter();

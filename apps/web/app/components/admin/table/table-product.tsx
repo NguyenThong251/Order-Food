@@ -15,8 +15,8 @@ import {
 } from "@repo/ui";
 import classes from "./TableScrollArea.module.css";
 import request from "../../../utils/request";
-import ModalDeleteProduct from "../modal/modal-product-delete";
-import ModalUpdateProduct from "../modal/modal-product-edit";
+import ModalDeleteProduct from "../components/modal/modal-product-delete";
+import ModalUpdateProduct from "../components/modal/modal-product-edit";
 
 interface Product {
   id: number;

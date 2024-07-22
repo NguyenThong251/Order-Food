@@ -1,8 +1,9 @@
 "use client";
 import { Grid, SimpleGrid } from "@repo/ui";
-import { Navbar } from "../../../components/user/navbar/navbar";
-import { Header } from "../../../components/user/header/header";
-import Order from "../../../components/user/order/order";
+import { Header } from "../../../components/client/pages/menu/Header";
+import Order from "../../../components/client/pages/menu/Order";
+import { Navbar } from "../../../components/client/pages/menu/Navbar";
+
 export default function LayoutMenu({
   children, // will be a page or nested layout
 }: {

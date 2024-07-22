@@ -2,8 +2,8 @@
 import React from "react";
 import { useState, useEffect, Container, Grid } from "@repo/ui";
 import Link from "next/link";
-import CardCategory from "../../../../components/user/components/card/CardCategory";
 import request from "../../../../utils/request";
+import CardCategory from "../../../../components/client/components/ui/CardCategory";
 interface Category {
   image: string;
   name: string;

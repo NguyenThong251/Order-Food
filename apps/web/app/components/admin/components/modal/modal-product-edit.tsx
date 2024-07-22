@@ -18,8 +18,11 @@ import {
   MdOutlineClear,
   Box,
   Notification,
+  IconEdit,
+  Tooltip,
 } from "@repo/ui";
-import request from "../../../utils/request";
+import { FC } from "react";
+import request from "../../../../utils/request";
 interface ProductFormValues {
   name: string;
   price_old: number;
@@ -28,7 +31,14 @@ interface ProductFormValues {
   description: string;
   thumbnail: string;
 }
-const ModalAddProduct = () => {
+interface ModalUpdateProductProps {
+  productId: number;
+  onUpdate: () => void;
+}
+const ModalUpdateProduct: FC<ModalUpdateProductProps> = ({
+  productId,
+  onUpdate,
+}) => {
   const [notification, setNotification] = useState<{
     title: string;
     message: string;
@@ -43,7 +53,8 @@ const ModalAddProduct = () => {
       }, 5000);
       return () => clearTimeout(timer);
     }
-  });
+  }, [notification]);
+
   const [files, setFiles] = useState<File[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const form = useForm({
@@ -56,13 +67,36 @@ const ModalAddProduct = () => {
       thumbnail: "",
     },
   });
-  const handleCreatePro = async (values: ProductFormValues) => {
+
+  const fetchProductData = async () => {
+    try {
+      const response = await request.get(`/products/?id=${productId}`);
+      const product = response.data[0];
+      form.setValues({
+        name: product.name,
+        price_old: product.price_old,
+        price: product.price,
+        description: product.description,
+        category_id: product.category_id,
+        thumbnail: product.thumbnail.join(","),
+      });
+    } catch (err) {
+      console.error("Error fetching product data:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (opened) {
+      fetchProductData();
+    }
+  }, [opened]);
+
+  const handleUpdateProduct = async (values: ProductFormValues) => {
     const { name, price_old, price, description, category_id, thumbnail } =
       values;
-    const newProduct = {
-      id: Date.now(),
+    const updatedProduct = {
       name,
-      // thumbnail: files.map((file) => URL.createObjectURL(file)),
+      //   thumbnail: files.map((file) => URL.createObjectURL(file)),
       thumbnail: thumbnail.split(",").map((url) => url.trim()),
       price: Number(price),
       price_old: Number(price_old),
@@ -70,27 +104,35 @@ const ModalAddProduct = () => {
       category_id: Number(category_id),
     };
     try {
-      const response = await request.post("/products", newProduct);
-      if (response.status === 201) {
-        setNotification({
-          title: "Success",
-          message: "You have successfully signed up!",
-          color: "teal",
-          icon: <FiCheckCircle size={18} />,
-        });
-        form.reset(); // Reset the form
-        setFiles([]); // Reset the files
+      const response = await request.put(
+        `/products/${productId}`,
+        updatedProduct
+      );
+      if (response.status === 200) {
+        alert("success");
+        // setNotification({
+        //   title: "Success",
+        //   message: "Product updated successfully!",
+        //   color: "teal",
+        //   icon: <FiCheckCircle size={18} />,
+        // });
+        // form.reset(); // Reset the form
+        // setFiles([]); // Reset the files
         close(); // Close the modal
+        onUpdate(); // Callback to refresh the product list
       }
     } catch (err) {
-      setNotification({
-        title: "Error",
-        message: "An error occurred during signup. Please try again.",
-        color: "red",
-        icon: <MdOutlineClear size={18} />,
-      });
+      alert(err);
+      //   setNotification({
+      //     title: "Error",
+      //     message:
+      //       "An error occurred while updating the product. Please try again.",
+      //     color: "red",
+      //     icon: <MdOutlineClear size={18} />,
+      //   });
     }
   };
+
   return (
     <>
       <Box>
@@ -106,29 +148,29 @@ const ModalAddProduct = () => {
         )}
       </Box>
       <Modal opened={opened} onClose={close} withCloseButton={false} size="50%">
-        <form onSubmit={form.onSubmit(handleCreatePro)}>
+        <form onSubmit={form.onSubmit(handleUpdateProduct)}>
           <Text fw={700} fz={20}>
-            Add product
+            Update Product
           </Text>
           <Grid>
             <Grid.Col span={12}>
               <TextInput
-                label="Name product"
-                placeholder="Name product"
+                label="Product Name"
+                placeholder="Product Name"
                 {...form.getInputProps("name")}
               />
             </Grid.Col>
             <Grid.Col span={6}>
               <NumberInput
-                label="Price old product"
-                placeholder="Price old product"
+                label="Old Price"
+                placeholder="Old Price"
                 {...form.getInputProps("price_old")}
               />
             </Grid.Col>
             <Grid.Col span={6}>
               <NumberInput
-                label="Price product"
-                placeholder="Price product"
+                label="Price"
+                placeholder="Price"
                 {...form.getInputProps("price")}
               />
             </Grid.Col>
@@ -153,44 +195,41 @@ const ModalAddProduct = () => {
                   accept="image/png,image/jpeg"
                   multiple
                 >
-                  {(props) => <Button {...props}>Upload image</Button>}
+                  {(props) => <Button {...props}>Upload Image</Button>}
                 </FileButton>
                 {files.length > 0 && (
                   <Text size="sm" mt="sm">
                     Picked files:
                   </Text>
                 )}
-
                 <ul>
                   {files.map((file, index) => (
                     <li key={index}>{file.name}</li>
                   ))}
                 </ul>
-              </Group>    */}
+              </Group> */}
               <Textarea
+                autosize
+                minRows={3}
+                maxRows={10}
+                {...form.getInputProps("thumbnail")}
                 label="Thumbnail"
                 placeholder="Thumbnail"
-                {...form.getInputProps("thumbnail")}
               />
             </Grid.Col>
             <Grid.Col span={12}>
               <Group justify="end">
-                <Button type="submit">Create Product</Button>
+                <Button type="submit">Update Product</Button>
               </Group>
             </Grid.Col>
           </Grid>
         </form>
       </Modal>
-      <Button
-        onClick={open}
-        leftSection={
-          <AiOutlinePlus style={{ width: rem(16), height: rem(16) }} />
-        }
-      >
-        Add Products
-      </Button>
+      <Tooltip onClick={open} label="Edit" withArrow>
+        <IconEdit size={20} />
+      </Tooltip>
     </>
   );
 };
 
-export default ModalAddProduct;
+export default ModalUpdateProduct;

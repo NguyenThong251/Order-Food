@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import React from "react";
 
-const HeaderMain: React.FC = () => {
+const Header: React.FC = () => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
@@ -93,4 +93,4 @@ const HeaderMain: React.FC = () => {
   );
 };
 
-export default HeaderMain;
+export default Header;
