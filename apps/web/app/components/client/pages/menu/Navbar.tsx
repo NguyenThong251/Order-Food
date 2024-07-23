@@ -51,10 +51,13 @@ const mockdata = [
 ];
 
 export function Navbar() {
+  const [isClient, setIsClient] = useState(false);
   const [active, setActive] = useState(0);
   const { user, clearUser } = useUserStore((state) => state);
   console.log(user);
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const handleLogout = () => {
     clearUser();
   };
@@ -66,7 +69,9 @@ export function Navbar() {
       onClick={() => setActive(index)}
     />
   ));
-
+  if (!isClient) {
+    return null;
+  }
   return (
     <Box style={{ height: "100vh", padding: "20px" }}>
       <Flex
@@ -85,11 +90,11 @@ export function Navbar() {
           </Box>
         </Center>
 
-        <div className={classes.navbarMain}>
+        <Box className={classes.navbarMain}>
           <Stack justify="center" gap={0}>
             {links}
           </Stack>
-        </div>
+        </Box>
 
         <Stack justify="center" gap={10} className={classes.bottomSection}>
           {user ? (
