@@ -14,9 +14,11 @@ import {
   AiOutlineFile,
   IconLogout,
   Flex,
+  useEffect,
 } from "@repo/ui";
 
 import classes from "./navbar.module.css";
+import { useUserStore } from "../../../../store";
 
 interface NavbarLinkProps {
   icon: typeof AiOutlineCoffee;
@@ -50,7 +52,12 @@ const mockdata = [
 
 export function Navbar() {
   const [active, setActive] = useState(0);
-
+  const { user, clearUser } = useUserStore((state) => state);
+  console.log(user);
+  useEffect(() => {}, []);
+  const handleLogout = () => {
+    clearUser();
+  };
   const links = mockdata.map((link, index) => (
     <NavbarLink
       {...link}
@@ -85,15 +92,23 @@ export function Navbar() {
         </div>
 
         <Stack justify="center" gap={10} className={classes.bottomSection}>
-          <Button variant="filled" color="red">
-            Login
-          </Button>
-          <Button variant="outline" color="red">
-            Signup
-          </Button>
-          {/* <Box className={classes.logout}>
-          <NavbarLink icon={IconLogout} label="Logout" />
-        </Box> */}
+          {user ? (
+            <>
+              <Text size="lg">{user.username}</Text>
+              <Button variant="outline" color="red" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="filled" color="red">
+                Login
+              </Button>
+              <Button variant="outline" color="red">
+                Signup
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
     </Box>

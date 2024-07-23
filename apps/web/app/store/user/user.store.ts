@@ -5,14 +5,9 @@ export const useUserStore = create<Action>()(
   devtools(
     persist(
       (set) => ({
-        // username: "",
-        // phone: 0,
-        // isAdmin: false,
-        // email:"",
-        // password: "",
-
-        setUser: (user: User) => set(user),
-        clearUser: () => set({ name: "", phone: 0 }),
+        user: null as User | null,
+        setUser: (user: User) => set({ user }),
+        clearUser: () => set({ user: null }),
       }),
       {
         name: "user-session",
