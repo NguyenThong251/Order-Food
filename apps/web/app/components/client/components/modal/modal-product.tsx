@@ -19,9 +19,9 @@ import {
 } from "@repo/ui";
 import React from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { CartItem, Products } from "../../../../interface";
-import { useCartStore } from "../../../../store";
-
+import { CartDB, CartItem, Products } from "../../../../interface";
+import { useCartStore, useUserStore } from "../../../../store";
+import request from "../../../../utils/request";
 
 interface ProductModalProps {
   opened: boolean;
@@ -46,14 +46,23 @@ const ProductModal: React.FC<ProductModalProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCartStore((state) => state);
-  const handleAddToCart = () => {
-    const newItem: CartItem = { product_id: product._id, quantity };
+  const { user } = useUserStore((state) => state);
+  const handleAddToCart = async () => {
+    const newItem: CartItem = {
+      product_id: product._id,
+      quantity,
+    };
+    if (user) {
+      const cartDB: CartDB = {
+        products: [{ product_id: product._id, quantity }],
+        user_id: user._id,
+      };
+      await request.post("/cart", cartDB);
+    }
     addItem(newItem);
 
     onClose();
   };
-  console.log(product);
-  // const productItem = product
   // xử lý price button
   const totalPrice = product.price * quantity;
   return (
