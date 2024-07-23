@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import {
   TextInput,
   useForm,
@@ -15,50 +15,128 @@ import {
   Container,
   Box,
   Image,
-} from '@repo/ui';
-import { GoogleButton } from '../components/ui/GoogleButton';
-import { TwitterButton } from '../components/ui/TwitterButton';
-
+  bcrypt,
+  FiCheckCircle,
+  useState,
+  FiAlertCircle,
+} from "@repo/ui";
+import { GoogleButton } from "../components/ui/GoogleButton";
+import { TwitterButton } from "../components/ui/TwitterButton";
+import Link from "next/link";
+import request from "../../../utils/request";
+import Notification from "../components/ui/Notification";
+import { User } from "../../../interface";
 
 export function RegisterForm(props: PaperProps) {
+  const [notification, setNotification] = useState<{
+    title: string;
+    message: string;
+    color: string;
+    icon: JSX.Element;
+  } | null>(null);
   const form = useForm({
     initialValues: {
-      email: '',
-      name: '',
-      password: '',
-      terms: true,
+      email: "",
+      name: "",
+      phone: "",
+      password: "",
+      point: 0,
+      isAdmin: 0,
     },
 
     validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
-      password: (val) => (val.length <= 6 ? 'Password should include at least 6 characters' : null),
+      name: (val) => (val.trim() === "" ? "Name cannot be empty" : null),
+      phone: (val) => (/^\d{10}$/.test(val) ? null : "Invalid phone number"),
+      email: (val) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
+      password: (val) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+          val
+        )
+          ? null
+          : "Password must be 8+ chars, with uppercase, lowercase, number, and special character.",
     },
   });
+  const handleSubmit = async (values: typeof form.values) => {
+    try {
+      const hashPassword = await bcrypt.hash(values.password, 10);
+      const data = {
+        email: values.email,
+        username: values.name,
+        phone: values.phone,
+        password: hashPassword,
+        point: values.point,
+        isAdmin: values.isAdmin,
+      };
+      const getdata = await request.get("/users");
+      const existingUser = getdata.data.find(
+        (user: User) =>
+          user.phone === values.phone || user.email === values.email
+      );
+      if (existingUser) {
+        // User already exists
+        setNotification({
+          title: "Error",
+          message: "Email or phone number already exists.",
+          color: "red",
+          icon: <FiAlertCircle size={18} />,
+        });
+        return;
+      }
+      // console.log(existingUser);
+
+      const res = await request.post("/users", data);
+      if (res.status === 201) {
+        setNotification({
+          title: "Success",
+          message: "You have successfully signed up!",
+          color: "teal",
+          icon: <FiCheckCircle size={18} />,
+        });
+        form.reset();
+      }
+    } catch (err) {
+      console.log(err);
+      setNotification({
+        title: "Error",
+        message: "An error occurred. Please try again.",
+        color: "red",
+        icon: <FiAlertCircle size={18} />,
+      });
+    }
+  };
 
   return (
-    <Box className='h-screen flex items-center justify-center'>
-      <Paper radius="md" p="xl" className='shadow-none sm:shadow-md' {...props}>
-        <Box className='flex items-center justify-center'>
-          <Image alt='img' w={55} src="http://localhost:3000/_next/image?url=https%3A%2F%2Fpng.pngtree.com%2Fpng-vector%2F20220708%2Fourmid%2Fpngtree-fast-food-logo-png-image_5763171.png&w=64&q=75" />
+    <Box className="flex items-center justify-center h-screen">
+      <Paper radius="md" p="xl" className="shadow-none sm:shadow-md" {...props}>
+        <Box className="flex items-center justify-center">
+          <Image
+            alt="img"
+            w={55}
+            src="http://localhost:3000/_next/image?url=https%3A%2F%2Fpng.pngtree.com%2Fpng-vector%2F20220708%2Fourmid%2Fpngtree-fast-food-logo-png-image_5763171.png&w=64&q=75"
+          />
         </Box>
         <Text size="lg" fw={500}>
           Welcome to Order Food, register with
         </Text>
-
-        <Group grow mb="md" mt="md">
-          <GoogleButton radius="xl">Google</GoogleButton>
-          <TwitterButton radius="xl">Twitter</TwitterButton>
-        </Group>
-
-        <Divider label="Or continue with email" labelPosition="center" my="lg" />
-
-        <form onSubmit={form.onSubmit(() => {})}>
+        <form className="mt-3" onSubmit={form.onSubmit(handleSubmit)}>
+          {notification && (
+            <Notification
+              icon={notification.icon}
+              message={notification.message}
+              color={notification.color}
+              title={notification.title}
+              onClose={() => setNotification(null)}
+            />
+          )}
           <Stack>
             <TextInput
               label="Name"
               placeholder="Your name"
               value={form.values.name}
-              onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
+              onChange={(event) =>
+                form.setFieldValue("name", event.currentTarget.value)
+              }
+              error={form.errors.name && "Invalid name"}
               radius="md"
             />
 
@@ -67,8 +145,21 @@ export function RegisterForm(props: PaperProps) {
               label="Email"
               placeholder="hello@mantine.dev"
               value={form.values.email}
-              onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-              error={form.errors.email && 'Invalid email'}
+              onChange={(event) =>
+                form.setFieldValue("email", event.currentTarget.value)
+              }
+              error={form.errors.email && "Invalid email"}
+              radius="md"
+            />
+            <TextInput
+              required
+              label="Phone"
+              placeholder="Phone Number"
+              value={form.values.phone}
+              onChange={(event) =>
+                form.setFieldValue("phone", event.currentTarget.value)
+              }
+              error={form.errors.phone && "Invalid phone"}
               radius="md"
             />
 
@@ -77,26 +168,25 @@ export function RegisterForm(props: PaperProps) {
               label="Password"
               placeholder="Your password"
               value={form.values.password}
-              onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-              error={form.errors.password && 'Password should include at least 6 characters'}
+              onChange={(event) =>
+                form.setFieldValue("password", event.currentTarget.value)
+              }
+              error={
+                form.errors.password &&
+                "Password should include at least 6 characters"
+              }
               radius="md"
-            />
-
-            <Checkbox
-              label="I accept terms and conditions"
-              checked={form.values.terms}
-              onChange={(event) => form.setFieldValue('terms', event.currentTarget.checked)}
             />
           </Stack>
 
-          <Group justify="space-between" mt="xl">
+          <Group justify="space-between" mt="lg">
             <Anchor component="button" type="button" c="dimmed" size="xs">
-              Already have an account? Login
+              <Link href="./login">Already have an account? Login</Link>
             </Anchor>
           </Group>
-            <Button className='w-full' color='red' type="submit" radius="md">
-              Register
-            </Button>
+          <Button className="w-full mt-5" color="red" type="submit" radius="md">
+            Register
+          </Button>
         </form>
       </Paper>
     </Box>
