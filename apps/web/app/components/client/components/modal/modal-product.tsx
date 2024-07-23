@@ -57,9 +57,26 @@ const ProductModal: React.FC<ProductModalProps> = ({
         products: [{ product_id: product._id, quantity }],
         user_id: user._id,
       };
-      await request.post("/cart", cartDB);
+      const userId = user._id;
+      const existingCart = await request.get(`/cart/${userId}`);
+      const existingProduct = existingCart.data.products.find(
+        (item: CartItem) => item.product_id === product._id
+      );
+      if (existingProduct) {
+        existingProduct.quantity += quantity;
+        await request.put(`/cart/${userId}`, {
+          ...existingCart.data,
+          products: existingCart.data.products,
+        });
+      }else{
+        await request.post("/cart", cartDB);
+
+      }
+      
+    } else {
+
+      addItem(newItem);
     }
-    addItem(newItem);
 
     onClose();
   };
