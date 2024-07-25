@@ -9,12 +9,11 @@ export default function LayoutUserDashboard({
 }) {
   return (
     <>
-      <div className="grid grid-cols-12 bg-[#eff1f5]">
-        <div className="col-span-2">
-          <SideBar />
-        </div>
-        <div className="col-span-10">
-          <div className="w-full h-screen">
+      <div className="flex bg-[#eff1f5]">
+        <SideBar />
+
+        <div className="w-full">
+          <div className="flex flex-col w-full h-screen overflow-y-hidden">
             <Header />
             <section>{children}</section>
           </div>
