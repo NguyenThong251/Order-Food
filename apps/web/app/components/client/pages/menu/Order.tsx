@@ -12,22 +12,25 @@ import {
   useEffect,
   useState,
 } from "@repo/ui";
-import { OrderData, Products, Table } from "../../../../interface";
-import { useCartStore, useOrderStore, useTableStore } from "../../../../store";
+import {
+  CartDB,
+  CartItem,
+  CartProduct,
+  OrderChefData,
+  OrderData,
+  Products,
+  Table,
+} from "../../../../interface";
+import {
+  useCartStore,
+  useOrderStore,
+  useTableStore,
+  useUserStore,
+} from "../../../../store";
 import request from "../../../../utils/request";
 import ModalDialogs from "../../components/modal/modal-dialogs";
 import CardOrderItem from "../../components/ui/CardOrderItem";
 
-// interface OrderItem {
-//   product_id: number;
-//   quantity: number;
-// }
-
-interface User {
-  id: number;
-  name: string;
-  phone: string;
-}
 const Order: React.FC = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const { items, clearCart, removeItem, updateItemQuantity } = useCartStore(
@@ -36,12 +39,13 @@ const Order: React.FC = () => {
   const { orderId, setOrderId } = useOrderStore((state) => state);
   const [loading, setLoading] = useState(true);
   const [productData, setProductData] = useState<Products[]>([]);
+  // const [cartDB, setCartDB] = useState<CartProduct[]>([]);
   const [phone, setPhone] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [isInputFilled, setIsInputFilled] = useState(false);
   const [tableData, setTableData] = useState<Table | null>(null);
   const tableId = useTableStore((state) => state._id);
-  const [user, setUser] = useState<User | null>(null);
+  // const [user, setUser] = useState<User | null>(null);
   const fetchDataProducts = async () => {
     try {
       const res = await Promise.all(
@@ -57,18 +61,44 @@ const Order: React.FC = () => {
   const fetchDataTable = async () => {
     const res = await request.get(`table/${tableId}`);
     setTableData(res.data);
-    // console.log(res.data);
   };
+  const { user } = useUserStore((state) => state);
+  // const fetchDataProductsCartItem = async () => {
+  //   if (user) {
+  //     const userId = user._id;
+  //     try {
+  //       const cartRes = await request.get(`/cart/${userId}`);
+  //       // setProductData(cartRes.data.products._id);
+  //       const products = cartRes.data?.products || [];
+  //       setCartDB(products);
+  //       const cartData = products;
+  //       const res = await Promise.all(
+  //         cartData.map((item: CartItem) =>
+  //           request.get(`products/${item.product_id}`)
+  //         )
+  //       );
+  //       setProductData(res.map((res) => res.data));
+  //     } catch (err) {
+  //       console.error("Error fetching cart items for user:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (user) {
+  //     fetchDataProductsCartItem();
+  //   } else {
+  //     fetchDataProducts();
+  //   }
+  //   fetchDataTable();
+  // }, [items, user]);
   useEffect(() => {
-    fetchDataTable();
     fetchDataProducts();
+    fetchDataTable();
   }, [items]);
   useEffect(() => {
-    // fetchDataProducts();
-    setIsInputFilled(
-      // phone.length >= 9 && name.trim() !== "" &&
-      tableId !== "" && productData.length > 0
-    );
+    setIsInputFilled(tableId !== "" && productData.length > 0);
   }, [items, phone, name, productData]);
   if (loading) {
     return <div>Loading...</div>;
@@ -89,8 +119,18 @@ const Order: React.FC = () => {
     // Xử lý khi nhấn Order, có thể đặt logic lưu đơn hàng và các thao tác cần thiết ở đây
     // phone,
     //   name,
+    const orderchefData: OrderChefData = {
+      products: items.map((item) => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+      })),
+      table_id: tableId,
+      status: "pending",
+      date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    };
+
     const orderData: OrderData = {
-      user_id: user ? user?.id : null,
+      user_id: user ? user._id : null,
       products: items.map((item) => ({
         product_id: item.product_id,
         quantity: item.quantity,
@@ -100,6 +140,7 @@ const Order: React.FC = () => {
       sub_total: totalPrice,
     };
     try {
+      await request.post("/orderchef", orderchefData);
       if (orderId) {
         const currentOrder = await request.get(`/order/${orderId}`);
         const updatedProducts = [
@@ -114,9 +155,7 @@ const Order: React.FC = () => {
       } else {
         const res = await request.post("/order", orderData);
         if (res.status === 201) {
-          if (!user) {
-            setOrderId(res.data._id);
-          }
+          setOrderId(res.data._id);
         }
       }
       clearCart();
@@ -125,13 +164,34 @@ const Order: React.FC = () => {
     }
   };
   // xử lý tổng quantity
-  const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalQty =
+    // user
+    //   ? cartDB.reduce((sum, item) => sum + item.quantity, 0)
+    //   :
+    items.reduce((sum, item) => sum + item.quantity, 0);
   // xử lý tổng price
-  const totalPrice = items.reduce((sum, item) => {
-    const product = productData.flat().find((p) => p._id === item.product_id);
-    // console.log(product);
-    return sum + (product ? product.price * item.quantity : 0);
-  }, 0);
+  const totalPrice =
+    // user
+    //   ? cartDB.reduce((sum, item) => {
+    //       const cartItem = productData
+    //         .flat()
+    //         .find((p) => p._id === item.product_id);
+    //       return sum + (cartItem ? cartItem.price * item.quantity : 0);
+    //     }, 0)
+    //   :
+    items.reduce((sum, item) => {
+      const product = productData.flat().find((p) => p._id === item.product_id);
+      return sum + (product ? product.price * item.quantity : 0);
+    }, 0);
+
+  // const handleClear = async () => {
+  //   if (user) {
+  //     const userId = user._id;
+  //     await request.delete(`/cart/${userId}`);
+  //   } else {
+  //     clearCart();
+  //   }
+  // };
   return (
     <>
       <ModalDialogs handleProps={clearCart} opened={opened} onClose={close} />
@@ -159,19 +219,17 @@ const Order: React.FC = () => {
                 <TextInput
                   label="Phone"
                   placeholder="Number Phone"
-                  value={phone}
+                  value={user ? user.phone : phone}
                   onChange={handlePhoneChange}
                   inputWrapperOrder={["label", "input", "error"]}
                 />
-                {/* error={phone.length! <= 9 ? "Please enter your phone" : ""} */}
                 <TextInput
                   label="Your name"
                   placeholder="Your name"
-                  value={name}
+                  value={user ? user.username : name}
                   inputWrapperOrder={["label", "input", "error"]}
                   onChange={handleNameChange}
                 />
-                {/* error={name.trim() === "" ? "Please enter your name" : ""} */}
               </Flex>
             </Box>
           </Box>
@@ -184,12 +242,26 @@ const Order: React.FC = () => {
                 alt="Empty Cart"
               />
             ) : (
-              items.map((item, index) => {
+              // user ? (
+              //   productData.flat().map((product: Products) => {
+              //     return (
+              //       <CardOrderItem
+              //         key={product._id}
+              //         product={product}
+              //         quantity={
+              //           cartDB.find((item) => item.product_id === product._id)
+              //             ?.quantity || 0
+              //         }
+              //         onRemove={removeItem}
+              //         onUpdateQuantity={updateItemQuantity}
+              //       />
+              //     );
+              //   })
+              // ) : (
+              items.map((item) => {
                 const product = productData
                   .flat()
                   .find((p) => p._id === item.product_id);
-                // console.log(productData.forEach((item) => item._id));
-
                 return product ? (
                   <CardOrderItem
                     key={item.product_id}
