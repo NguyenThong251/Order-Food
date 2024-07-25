@@ -54,7 +54,6 @@ export function Navbar() {
   const [isClient, setIsClient] = useState(false);
   const [active, setActive] = useState(0);
   const { user, clearUser } = useUserStore((state) => state);
-  console.log(user);
   useEffect(() => {
     setIsClient(true);
   }, []);

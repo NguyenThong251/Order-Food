@@ -4,3 +4,4 @@ export * from "./user.interface";
 export * from "./category.interface";
 export * from "./table.interface";
 export * from "./order.interface";
+export * from "./orderchef.interface";

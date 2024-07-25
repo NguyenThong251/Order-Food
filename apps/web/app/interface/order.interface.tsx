@@ -4,7 +4,7 @@ export interface OrderProduct {
 }
 
 export interface OrderData {
-  user_id: number | null;
+  user_id: string | null;
   products: OrderProduct[];
   table_id: string;
   sub_total: number;
