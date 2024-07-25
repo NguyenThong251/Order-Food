@@ -13,7 +13,12 @@ export * from "@radix-ui/react-slot";
 export * from "class-variance-authority";
 export * from "tailwind-merge";
 
-export { motion, useScroll, useMotionValueEvent } from "framer-motion";
+export {
+  motion,
+  useScroll,
+  useMotionValueEvent,
+  AnimatePresence,
+} from "framer-motion";
 export { Carousel } from "@mantine/carousel";
 export { persist, devtools } from "zustand/middleware";
 // export {motio} from "framer-motion";

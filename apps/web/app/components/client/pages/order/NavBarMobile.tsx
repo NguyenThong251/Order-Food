@@ -21,7 +21,7 @@ type NavbarProps = {
   dataNavbar: NavbarData;
 };
 
-const Navbar: React.FC<NavbarProps> = ({ dataNavbar }) => {
+const NavbarMobile: React.FC<NavbarProps> = ({ dataNavbar }) => {
   const router = usePathname();
 
   return (
@@ -80,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ dataNavbar }) => {
                     />
                   </div>
                   <div
-                    className={`hidden text-lg font-medium lg:block ${
+                    className={` text-lg font-medium  ${
                       isActive
                         ? "text-customOrange"
                         : "text-gray-400 group-hover:text-customOrange"
@@ -98,4 +98,4 @@ const Navbar: React.FC<NavbarProps> = ({ dataNavbar }) => {
   );
 };
 
-export default Navbar;
+export default NavbarMobile;
