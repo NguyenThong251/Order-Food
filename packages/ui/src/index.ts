@@ -12,6 +12,8 @@ export * from "@mantine/dropzone";
 export * from "@radix-ui/react-slot";
 export * from "class-variance-authority";
 export * from "tailwind-merge";
+import Swal from "sweetalert2";
+export { Swal };
 
 export {
   motion,
