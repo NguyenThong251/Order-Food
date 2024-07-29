@@ -147,19 +147,6 @@ export default function Page() {
             onChange={(value) => setToPrice(value as number)}
             label="To Price"
           />
-          {/* <Select
-            checkIconPosition="right"
-            label="Sort By"
-            placeholder="Select an option"
-            value={sortOption}
-            data={[
-              { value: "name-asc", label: "Name (A-Z)" },
-              { value: "name-desc", label: "Name (Z-A)" },
-              { value: "price-asc", label: "Price (Low to High)" },
-              { value: "price-desc", label: "Price (High to Low)" },
-            ]}
-            onChange={(value) => setSortOption(value)}
-          /> */}
           <Button onClick={handleFilter} variant="filled" color="red">
             Filter
           </Button>

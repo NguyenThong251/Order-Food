@@ -43,67 +43,44 @@ const CardProduct: React.FC<CardProductProps> = ({
   return (
     <>
       <ProductModal opened={opened} onClose={close} product={product} />
-      <Card
-        padding={0}
-        shadow="sm"
-        radius="md"
-        withBorder
-        style={{ position: "relative" }}
-      >
+      <Card className="relative p-0 rounded-md">
         {seller === 1 && (
-          <Badge
-            style={{
-              position: "absolute",
-              top: rem(8),
-              right: rem(8),
-              zIndex: 1,
-            }}
-            color="green"
-          >
+          <Badge className="absolute z-10 bg-green-600 top-2 right-2">
             Seller
           </Badge>
         )}
-        <Card.Section component="a">
-          <Image
-            className="h-40"
-            src={
-              image !== ""
-                ? image
-                : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
-            }
-            alt={name}
-          />
-        </Card.Section>
-        <Box p="xs">
-          <Group justify="space-between" mb="xs">
-            <Text fw={500}>{name}</Text>
-          </Group>
+        <div>
+          <div className="h-28">
+            <Image
+              className="h-full"
+              src={
+                image !== ""
+                  ? image
+                  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
+              }
+              alt={name}
+            />
+          </div>
+        </div>
+        <Box className="flex items-center justify-between p-2">
+          <div>
+            <Text className="text-xs font-medium">{name}</Text>
+            <Text className="text-xs font-medium">
+              Price: {price.toLocaleString()} VNĐ
+            </Text>
+          </div>
           {/* <Text size="sm" color="dimmed">
           {description}
         </Text> */}
-          <Text size="sm" fw={500}>
-            Price: {price} VNĐ
-          </Text>
-          <Box mt="md">
-            <Flex justify="end" align="center">
-              <motion.button whileTap={{ scale: 0.97 }}>
-                <Button
-                  color="red"
-                  style={{
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: rem(40),
-                    height: rem(40),
-                  }}
-                  // onClick={open}
+          <Box>
+            <motion.button whileTap={{ scale: 0.97 }}>
+              <div className="">
+                <AiOutlinePlus
+                  className="w-6 h-6 text-white rounded-full bg-customOrange "
                   onClick={handleOpen}
-                >
-                  <AiOutlinePlus size={20} />
-                </Button>
-              </motion.button>
-            </Flex>
+                />
+              </div>
+            </motion.button>
           </Box>
         </Box>
       </Card>
