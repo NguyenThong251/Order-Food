@@ -1,10 +1,18 @@
 import Link from "next/link";
 import React from "react";
-import { Box, TbArticle, TbBowlChopsticks } from "@repo/ui";
+import {
+  Box,
+  TbArticle,
+  TbBowlChopsticks,
+  TbCashBanknote,
+  TbClipboardCheck,
+} from "@repo/ui";
 import { useRouter, usePathname } from "next/navigation";
 const iconComponents = {
   TbBowlChopsticks: TbBowlChopsticks,
   TbArticle: TbArticle,
+  TbClipboardCheck: TbClipboardCheck,
+  TbCashBanknote: TbCashBanknote,
 };
 
 type IconType = keyof typeof iconComponents;
@@ -19,11 +27,14 @@ type NavbarData = {
 
 type NavbarProps = {
   dataNavbar: NavbarData;
+  close: () => void;
 };
-
-const NavbarMobile: React.FC<NavbarProps> = ({ dataNavbar }) => {
+const NavbarMobile: React.FC<NavbarProps> = ({ close, dataNavbar }) => {
   const router = usePathname();
 
+  const handleClick = () => {
+    close();
+  };
   return (
     <>
       {/* <Box className="flex flex-col gap-5 mt-10">
@@ -60,7 +71,7 @@ const NavbarMobile: React.FC<NavbarProps> = ({ dataNavbar }) => {
           const IconComponent = iconComponents[item.icons];
           const isActive = router === item.href;
           return (
-            <Link href={item.href} key={index}>
+            <Link onClick={handleClick} href={item.href} key={index}>
               <ul
                 className={`border-2 rounded-lg ${
                   isActive
@@ -68,7 +79,7 @@ const NavbarMobile: React.FC<NavbarProps> = ({ dataNavbar }) => {
                     : "bg-white border-gray-400 group hover:border-customOrange ease-in-out hover:-translate-y-1 duration-300 hover:shadow-lg hover:transition-all hover:bg-[#fdeeeb] hover:text-customOrange"
                 }`}
               >
-                <li className="flex items-center justify-center gap-4 px-4 py-2 lg:justify-start">
+                <li className="flex items-center justify-start gap-4 px-4 py-2">
                   <div className="">
                     <IconComponent
                       className={`${

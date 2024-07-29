@@ -10,6 +10,7 @@ import {
   Image,
   NumberInput,
   SimpleGrid,
+  TbX,
   Text,
   Title,
 } from "@repo/ui";
@@ -38,68 +39,60 @@ const CardOrderItem: React.FC<CardOrderItemProps> = ({
   };
   return (
     <>
-      <Grid>
-        <Grid.Col span={4}>
-          <div>
-            <Image
-              w={100}
-              h={100}
-              radius="md"
-              src={
-                product.thumbnails[0] ||
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
-              }
-              alt={product.name}
-            />
-          </div>
-        </Grid.Col>
-        <Grid.Col span={6}>
+      <div className="flex justify-between ">
+        <div className="">
+          <Image
+            className="w-20 h-20 rounded-md"
+            src={
+              product.thumbnails[0] ||
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
+            }
+            alt={product.name}
+          />
+        </div>
+        <div>
+          <Flex justify="space-between" align="center">
+            <h3 className="font-medium text-md">{product.name}</h3>
+            <Text>{product.category.name}</Text>
+          </Flex>
+          <Text>{product.price.toLocaleString()} VNĐ</Text>
           <Box>
-            <Flex justify="space-between" align="center">
-              <Title fz={16}>{product.name}</Title>
-              <Text>{product.category.name}</Text>
-            </Flex>
-            <Text>Price:{product.price}VNĐ</Text>
-            <Box>
-              <Flex align="center">
-                <AiOutlineMinus
-                  size={20}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleUpdateQuantity(quantity - 1)}
-                />
+            <Flex align="center">
+              <AiOutlineMinus
+                className="p-1 text-gray-900 rounded-full cursor-pointer w-7 h-7 bg-slate-200"
+                onClick={() => handleUpdateQuantity(quantity - 1)}
+              />
 
-                <NumberInput
-                  value={quantity}
-                  hideControls
-                  styles={{
-                    input: {
-                      border: "none",
-                      textAlign: "center",
-                      width: 60,
-                    },
-                  }}
-                  onChange={(value) => handleUpdateQuantity(Number(value))}
-                />
-                <AiOutlinePlus
-                  size={20}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleUpdateQuantity(quantity + 1)}
-                />
-              </Flex>
-            </Box>
+              <NumberInput
+                value={quantity}
+                hideControls
+                styles={{
+                  input: {
+                    border: "none",
+                    textAlign: "center",
+                    width: 60,
+                  },
+                }}
+                onChange={(value) => handleUpdateQuantity(Number(value))}
+              />
+              <AiOutlinePlus
+                className="p-1 text-gray-900 rounded-full cursor-pointer w-7 h-7 bg-slate-200"
+                onClick={() => handleUpdateQuantity(quantity + 1)}
+              />
+            </Flex>
           </Box>
-        </Grid.Col>
-        <Grid.Col span={2}>
+        </div>
+        <div>
           <Flex align="end" justify="end">
-            <AiFillDelete
+            <TbX
               style={{ cursor: "pointer" }}
               size={20}
               color="rgba(255, 0, 0, 1)"
               onClick={() => onRemove(product._id)}
             />
           </Flex>
-        </Grid.Col>
-      </Grid>
+        </div>
+      </div>
     </>
   );
 };

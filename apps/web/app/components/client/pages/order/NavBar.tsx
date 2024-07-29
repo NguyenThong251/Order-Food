@@ -1,10 +1,18 @@
 import Link from "next/link";
 import React from "react";
-import { Box, TbArticle, TbBowlChopsticks } from "@repo/ui";
+import {
+  Box,
+  TbArticle,
+  TbBowlChopsticks,
+  TbCashBanknote,
+  TbClipboardCheck,
+} from "@repo/ui";
 import { useRouter, usePathname } from "next/navigation";
 const iconComponents = {
   TbBowlChopsticks: TbBowlChopsticks,
   TbArticle: TbArticle,
+  TbClipboardCheck: TbClipboardCheck,
+  TbCashBanknote: TbCashBanknote,
 };
 
 type IconType = keyof typeof iconComponents;

@@ -90,7 +90,7 @@ export function LoginForm(props: PaperProps) {
         color: "teal",
         icon: <FiCheckCircle size={18} />,
       });
-      router.push("/menu/product");
+      router.push("/order/dashboard");
       setUser(user);
     } catch (error) {
       console.error(error);

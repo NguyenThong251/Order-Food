@@ -8,6 +8,7 @@ import {
   Image,
   Indicator,
   Menu,
+  Modal,
   rem,
   TbFilterPlus,
   TbLogout,
@@ -17,19 +18,37 @@ import {
   Text,
   TextInput,
   useDisclosure,
+  useEffect,
+  useState,
 } from "@repo/ui";
 import NavbarMobile from "./NavBarMobile";
+import Order from "./dashboard/Order";
+import ProductFilter from "../../components/modal/modal-filter";
+import { Category } from "../../../../interface";
+import request from "../../../../utils/request";
+import { useUserStore } from "../../../../store";
 const dataNavbar = {
   items: [
     {
       icons: "TbBowlChopsticks" as const,
       label: "Dashboard",
-      href: "/order",
+      href: "/order/dashboard",
     },
     {
       icons: "TbArticle" as const,
-      label: "Order Detail",
-      href: "/order-detail",
+      label: "Order History",
+      href: "/order/history",
+    },
+
+    {
+      icons: "TbClipboardCheck" as const,
+      label: "Voucher",
+      href: "/order/voucher",
+    },
+    {
+      icons: "TbCashBanknote" as const,
+      label: "Payment",
+      href: "/order/payment",
     },
   ],
 };
@@ -39,6 +58,37 @@ const Header = () => {
   const [cartOpened, { open: openCart, close: closeCart }] = useDisclosure();
   const [filterOpened, { open: openFilter, close: closeFilter }] =
     useDisclosure();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [fromPrice, setFromPrice] = useState<number | undefined>(undefined);
+  const [toPrice, setToPrice] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await request.get("/categories");
+        setCategories(res.data);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Handlers for filter actions
+  const handleFilter = () => {
+    // Implement the filtering logic here
+    console.log("Filtering products...");
+  };
+
+  const handleReset = () => {
+    setSearchQuery("");
+    setSelectedCategory(null);
+    setFromPrice(undefined);
+    setToPrice(undefined);
+    console.log("Resetting filters...");
+  };
   return (
     <>
       {/* MODAL NAV*/}
@@ -48,7 +98,7 @@ const Header = () => {
         onClose={closeMenu}
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
       >
-        <NavbarMobile dataNavbar={dataNavbar} />
+        <NavbarMobile close={closeMenu} dataNavbar={dataNavbar} />
       </Drawer>
       {/* MODAL END NAV*/}
       {/* MODAL CART */}
@@ -58,21 +108,25 @@ const Header = () => {
         opened={cartOpened}
         onClose={closeCart}
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-      ></Drawer>
+      >
+        <div className="flex flex-col justify-between ">
+          <Order />
+        </div>
+      </Drawer>
       {/* MODAL END CART */}
-      {/* MODAL CART */}
-      <Drawer
-        size="xs"
-        position="top"
+      {/* MODAL FILTER */}
+      <Modal
+        size="md"
         opened={filterOpened}
         onClose={closeFilter}
+        title="Fillter Product"
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
-      ></Drawer>
-      {/* MODAL END CART */}
-      <div className="w-full px-6 py-2 bg-white">
-        <div className="flex flex-col-reverse justify-between gap-4 py-4 sm:flex-row">
+      ></Modal>
+      {/* MODAL END FILTER */}
+      <div className="w-full px-6 bg-white">
+        <div className="flex flex-col-reverse justify-between gap-4 py-2 pt-4 sm:flex-row">
           <div className="flex justify-between gap-4 sm:justify-start ">
-            <div className="flex gap-4">
+            {/* <div className="flex gap-4">
               <TextInput
                 className="!active:border-red-500 w-48 sm:w-64"
                 variant="filled"
@@ -88,7 +142,7 @@ const Header = () => {
             >
               <Text className="hidden sm:block">Filter</Text>{" "}
               <TbFilterPlus className="text-lg lg:ms-3" />
-            </Button>
+            </Button> */}
           </div>
           <div className="flex items-center justify-between gap-4">
             <Burger
@@ -106,7 +160,7 @@ const Header = () => {
             />
             <div className="flex items-center gap-4">
               <Indicator
-                className="block lg:hidden"
+                className="block xl:hidden"
                 inline
                 label="11"
                 color="red"
