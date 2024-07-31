@@ -39,12 +39,12 @@ export function LoginForm(props: PaperProps) {
   } | null>(null);
   const form = useForm({
     initialValues: {
-      phone: "",
+      email: "",
       password: "",
     },
 
     validate: {
-      phone: (val) => (/^\d{10}$/.test(val) ? null : "Invalid phone number"),
+      email: (val) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
       password: (val) =>
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
           val
@@ -55,12 +55,12 @@ export function LoginForm(props: PaperProps) {
   });
   const handleSubmit = async (values: typeof form.values) => {
     try {
-      const { phone, password } = values;
+      const { email, password } = values;
 
       const response = await request.get("/users");
       const users = response.data;
 
-      const user = users.find((user: { phone: string }) => user.phone == phone);
+      const user = users.find((user: { email: string }) => user.email == email);
       if (!user) {
         setNotification({
           title: "Error",
@@ -140,13 +140,13 @@ export function LoginForm(props: PaperProps) {
           <Stack>
             <TextInput
               required
-              label="Phone number"
-              placeholder="Phone number"
-              value={form.values.phone}
+              label="Email "
+              placeholder="Your email "
+              value={form.values.email}
               onChange={(event) =>
-                form.setFieldValue("phone", event.currentTarget.value)
+                form.setFieldValue("email", event.currentTarget.value)
               }
-              error={form.errors.phone && "Invalid email"}
+              error={form.errors.email && "Invalid email"}
               radius="md"
             />
 

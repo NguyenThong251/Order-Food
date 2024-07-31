@@ -109,6 +109,17 @@ const page = () => {
     );
     setFilteredData(filtered);
   };
+  const handleCategoryClick = (categoryId: string) => {
+    if (categoryId === "") {
+      setSelectedCategory(null);
+      setFilteredData(data);
+      return;
+    }
+    setSelectedCategory(categoryId);
+    setFilteredData(
+      data.filter((product) => product.category._id === categoryId)
+    );
+  };
   const productsPerPage = 10;
   const pages = chunk(filteredData, productsPerPage);
   if (loading) {
@@ -174,13 +185,23 @@ const page = () => {
             <section>
               <h3 className="text-lg font-medium">Explore Categories</h3>
               <div className="grid grid-cols-5 gap-4 mt-3">
-                <div className="flex items-center justify-center gap-3 p-1 text-white rounded-md shadow-lg sm:justify-start bg-customOrange">
+                <div
+                  onClick={() => handleCategoryClick("")}
+                  className={`flex items-center justify-center gap-3  p-1  rounded-md shadow-lg sm:justify-start ${
+                    selectedCategory === null
+                      ? "bg-customOrange text-white"
+                      : " duration-300 ease-in-out bg-white shadow-md hover:-translate-y-1 hover:shadow-lg  hover:shadow-customOrange"
+                  }`}
+                >
                   <div className="p-2 bg-gray-100 rounded-md 2/4">
                     <TbChefHat className="w-8 h-8 rounded-md text-gray-950" />
                   </div>
                   <h2 className="hidden font-medium lg:block"> All </h2>
                 </div>
-                <Categories />
+                <Categories
+                  selectedCategory={selectedCategory}
+                  onCategoryClick={handleCategoryClick}
+                />
               </div>
             </section>
             {/* PRODUCT */}
@@ -229,7 +250,7 @@ const page = () => {
           </div>
           {/* l w-4/12 hidden */}
           <div className="hidden col-span-3 xl:block">
-            <div className="relative flex flex-col justify-between h-[80vh] rounded-md shadow-lg bg-white p-2">
+            <div className="relative flex flex-col justify-between h-[78vh] rounded-md shadow-lg bg-white p-2">
               <Order />
             </div>
           </div>

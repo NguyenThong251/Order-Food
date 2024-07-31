@@ -11,9 +11,12 @@ import {
   Modal,
   rem,
   TbFilterPlus,
+  TbLogin,
   TbLogout,
   TbReceipt,
   TbShoppingCart,
+  TbUser,
+  TbUserPlus,
   TbZoom,
   Text,
   TextInput,
@@ -26,7 +29,9 @@ import Order from "./dashboard/Order";
 import ProductFilter from "../../components/modal/modal-filter";
 import { Category } from "../../../../interface";
 import request from "../../../../utils/request";
-import { useUserStore } from "../../../../store";
+import { useCartStore, useUserStore } from "../../../../store";
+import Link from "next/link";
+
 const dataNavbar = {
   items: [
     {
@@ -53,6 +58,7 @@ const dataNavbar = {
   ],
 };
 const Header = () => {
+  const { user, clearUser } = useUserStore((state) => state);
   const [menuOpened, { toggle: toggleMenu, open: openMenu, close: closeMenu }] =
     useDisclosure();
   const [cartOpened, { open: openCart, close: closeCart }] = useDisclosure();
@@ -63,6 +69,13 @@ const Header = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [fromPrice, setFromPrice] = useState<number | undefined>(undefined);
   const [toPrice, setToPrice] = useState<number | undefined>(undefined);
+
+  const { items } = useCartStore((state) => state);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -75,20 +88,8 @@ const Header = () => {
 
     fetchCategories();
   }, []);
+  const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Handlers for filter actions
-  const handleFilter = () => {
-    // Implement the filtering logic here
-    console.log("Filtering products...");
-  };
-
-  const handleReset = () => {
-    setSearchQuery("");
-    setSelectedCategory(null);
-    setFromPrice(undefined);
-    setToPrice(undefined);
-    console.log("Resetting filters...");
-  };
   return (
     <>
       {/* MODAL NAV*/}
@@ -125,25 +126,7 @@ const Header = () => {
       {/* MODAL END FILTER */}
       <div className="w-full px-6 bg-white">
         <div className="flex flex-col-reverse justify-between gap-4 py-2 pt-4 sm:flex-row">
-          <div className="flex justify-between gap-4 sm:justify-start ">
-            {/* <div className="flex gap-4">
-              <TextInput
-                className="!active:border-red-500 w-48 sm:w-64"
-                variant="filled"
-                placeholder="Search food..."
-              />
-              <Button className="bg-customOrange hover:bg-[#e6570f]">
-                <TbZoom className="text-lg" />
-              </Button>{" "}
-            </div>
-            <Button
-              onClick={openFilter}
-              className="flex items-center  bg-customOrange hover:bg-[#e6570f]"
-            >
-              <Text className="hidden sm:block">Filter</Text>{" "}
-              <TbFilterPlus className="text-lg lg:ms-3" />
-            </Button> */}
-          </div>
+          <div className="flex justify-between gap-4 sm:justify-start "></div>
           <div className="flex items-center justify-between gap-4">
             <Burger
               className="block sm:hidden"
@@ -162,7 +145,7 @@ const Header = () => {
               <Indicator
                 className="block xl:hidden"
                 inline
-                label="11"
+                label={isClient ? totalQty : "0"}
                 color="red"
                 size={16}
                 onClick={openCart}
@@ -177,33 +160,71 @@ const Header = () => {
                     alt="it's me"
                   />
                 </Menu.Target>
-
-                <Menu.Dropdown>
-                  <Menu.Item
-                    leftSection={
-                      <IconSettings
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    }
-                  >
-                    Settings
-                  </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <TbReceipt style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Order
-                  </Menu.Item>
-                  <Menu.Divider />
-                  <Menu.Item
-                    leftSection={
-                      <TbLogout style={{ width: rem(14), height: rem(14) }} />
-                    }
-                  >
-                    Logout
-                  </Menu.Item>
-                </Menu.Dropdown>
+                {user ? (
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      leftSection={
+                        <TbUser style={{ width: rem(14), height: rem(14) }} />
+                      }
+                    >
+                      {user?.username}
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <IconSettings
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      Settings
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={
+                        <TbReceipt
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      }
+                    >
+                      Order
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item
+                      onClick={clearUser}
+                      leftSection={
+                        <TbLogin style={{ width: rem(14), height: rem(14) }} />
+                      }
+                    >
+                      Logout
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                ) : (
+                  <Menu.Dropdown>
+                    <Link href="/auth/login">
+                      <Menu.Item
+                        className="flex items-center"
+                        leftSection={
+                          <TbLogout
+                            style={{ width: rem(14), height: rem(14) }}
+                          />
+                        }
+                      >
+                        Login
+                      </Menu.Item>
+                    </Link>
+                    <Link href="/auth/signup">
+                      <Menu.Item
+                        className="flex items-center"
+                        leftSection={
+                          <TbUserPlus
+                            style={{ width: rem(14), height: rem(14) }}
+                          />
+                        }
+                      >
+                        Register
+                      </Menu.Item>
+                    </Link>
+                  </Menu.Dropdown>
+                )}
               </Menu>
             </div>
           </div>

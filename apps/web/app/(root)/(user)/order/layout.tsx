@@ -9,7 +9,7 @@ export default function LayoutUserDashboard({
 }) {
   return (
     <>
-      <div className="flex bg-[#eff1f5]">
+      <div className="flex bg-[#eff1f5]" suppressHydrationWarning={true}>
         <SideBar />
 
         <div className="w-full">

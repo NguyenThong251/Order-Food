@@ -52,28 +52,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
       product_id: product._id,
       quantity,
     };
-    // if (user) {
-    //   const cartDB: CartDB = {
-    //     products: [{ product_id: product._id, quantity }],
-    //     user_id: user._id,
-    //   };
-    //   const userId = user._id;
-    //   try {
-    //     const existingCart = await request.get(`/cart/${userId}`);
-    //     const existingProduct = existingCart.data.products.find(
-    //       (item: CartItem) => item.product_id === product._id
-    //     );
-    //     if (existingProduct) {
-    //       existingProduct.quantity += quantity;
-    //     } else {
-    //       existingCart.data.products.push(newItem);
-    //     }
-    //     await request.put(`/cart/${userId}`, existingCart.data);
-    //     // update cart
-    //   } catch (error) {
-    //     await request.post("/cart", cartDB);
-    //   }
-    // } else {
+
     addItem(newItem);
     // }
 
@@ -94,10 +73,10 @@ const ProductModal: React.FC<ProductModalProps> = ({
         animate={opened ? "visible" : "hidden"}
         exit="exit"
         variants={modalVariants}
-        style={{ overflow: "hidden", borderRadius: "10px" }}
+        className="overflow-hidden rounded-md"
       >
         <Card>
-          <Card.Section style={{ position: "relative" }}>
+          <Card.Section className="relative">
             <Image
               src={product.thumbnails[currentIndex]}
               className="h-52"

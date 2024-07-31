@@ -20,6 +20,7 @@ import {
   CartProduct,
   OrderChefData,
   OrderData,
+  OrderProduct,
   Products,
   Table,
 } from "../../../../../interface";
@@ -119,9 +120,23 @@ const Order: React.FC = () => {
           ...currentOrder.data.products,
           ...orderData.products,
         ];
+        const aggregatedUpdatedProducts = updatedProducts.reduce(
+          (acc: OrderProduct[], item: OrderProduct) => {
+            const existingItem = acc.find(
+              (i: OrderProduct) => i.product_id === item.product_id
+            );
+            if (existingItem) {
+              existingItem.quantity += item.quantity;
+            } else {
+              acc.push({ ...item });
+            }
+            return acc;
+          },
+          []
+        );
         await request.put(`/order/${orderId}`, {
           ...currentOrder.data,
-          products: updatedProducts,
+          products: aggregatedUpdatedProducts,
           sub_total: currentOrder.data.sub_total + totalPrice,
         });
       } else {

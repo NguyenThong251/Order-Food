@@ -18,6 +18,7 @@ import {
   CartProduct,
   OrderChefData,
   OrderData,
+  OrderProduct,
   Products,
   Table,
 } from "../../../../interface";
@@ -119,6 +120,7 @@ const Order: React.FC = () => {
     // Xử lý khi nhấn Order, có thể đặt logic lưu đơn hàng và các thao tác cần thiết ở đây
     // phone,
     //   name,
+    console.log("hello");
     const orderchefData: OrderChefData = {
       products: items.map((item) => ({
         product_id: item.product_id,
@@ -147,9 +149,24 @@ const Order: React.FC = () => {
           ...currentOrder.data.products,
           ...orderData.products,
         ];
+        const aggregatedUpdatedProducts = updatedProducts.reduce(
+          (acc: OrderProduct[], item: OrderProduct) => {
+            const existingItem = acc.find(
+              (i: OrderProduct) => i.product_id === item.product_id
+            );
+            console.log(existingItem);
+            if (existingItem) {
+              existingItem.quantity += item.quantity;
+            } else {
+              acc.push({ ...item });
+            }
+            return acc;
+          },
+          []
+        );
         await request.put(`/order/${orderId}`, {
           ...currentOrder.data,
-          products: updatedProducts,
+          products: aggregatedUpdatedProducts,
           sub_total: currentOrder.data.sub_total + totalPrice,
         });
       } else {
