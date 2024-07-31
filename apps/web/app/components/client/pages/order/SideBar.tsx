@@ -12,11 +12,12 @@ import React from "react";
 import Navbar from "./NavBar";
 import Link from "next/link";
 import { useUserStore } from "../../../../store";
+import dynamic from "next/dynamic";
 const dataNavbar = {
   items: [
     {
       icons: "TbBowlChopsticks" as const,
-      label: "Dashboard",
+      label: "Order",
       href: "/order/dashboard",
     },
     {
@@ -37,6 +38,7 @@ const dataNavbar = {
     },
   ],
 };
+const NoSSRLink = dynamic(() => import("next/link"), { ssr: false });
 const SideBar: React.FC = () => {
   const { user, clearUser } = useUserStore((state) => state);
   return (
@@ -59,10 +61,13 @@ const SideBar: React.FC = () => {
           </div>
           <div className="flex flex-col gap-4">
             {user ? (
-              <Link onClick={clearUser} href="">
-                <ul className="duration-300 ease-in-out bg-white border-2 rounded-lg group hover:bg-customOrange border-customOrange hover:-translate-y-1 hover:shadow-lg hover:transition-all hover:text-customOrange">
-                  <li className="flex items-center justify-center gap-4 px-4 py-2 ">
-                    <div className="">
+              <NoSSRLink href="">
+                <div
+                  onClick={clearUser}
+                  className="duration-300 ease-in-out bg-white border-2 rounded-lg group hover:bg-customOrange border-customOrange hover:-translate-y-1 hover:shadow-lg hover:transition-all hover:text-customOrange"
+                >
+                  <div className="flex items-center justify-center gap-4 px-4 py-2">
+                    <div>
                       <TbLogout2
                         className="text-customOrange group-hover:text-white"
                         size={25}
@@ -71,14 +76,14 @@ const SideBar: React.FC = () => {
                     <div className="hidden text-lg font-medium lg:block group-hover:text-white text-customOrange">
                       Logout
                     </div>
-                  </li>
-                </ul>
-              </Link>
+                  </div>
+                </div>
+              </NoSSRLink>
             ) : (
-              <Link href="/auth/login">
-                <ul className="duration-300 ease-in-out bg-white border-2 rounded-lg group hover:bg-customOrange border-customOrange hover:-translate-y-1 hover:shadow-lg hover:transition-all hover:text-customOrange">
-                  <li className="flex items-center justify-center gap-4 px-4 py-2 ">
-                    <div className="">
+              <NoSSRLink href="/auth/login">
+                <div className="duration-300 ease-in-out bg-white border-2 rounded-lg group hover:bg-customOrange border-customOrange hover:-translate-y-1 hover:shadow-lg hover:transition-all hover:text-customOrange">
+                  <div className="flex items-center justify-center gap-4 px-4 py-2">
+                    <div>
                       <TbLogin2
                         className="text-customOrange group-hover:text-white"
                         size={25}
@@ -87,14 +92,10 @@ const SideBar: React.FC = () => {
                     <div className="hidden text-lg font-medium lg:block group-hover:text-white text-customOrange">
                       Login
                     </div>
-                  </li>
-                </ul>
-              </Link>
+                  </div>
+                </div>
+              </NoSSRLink>
             )}
-
-            {/* <Button variant="outline" color="red">
-              Signup
-            </Button> */}
           </div>
         </div>
       </div>

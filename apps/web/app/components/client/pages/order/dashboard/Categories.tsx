@@ -3,8 +3,11 @@ import { useEffect, useState } from "@repo/ui";
 import request from "../../../../../utils/request";
 import { Category } from "../../../../../interface";
 import CardCategory from "../../../components/ui/CardCategory";
-
-const Categories = () => {
+interface CategoriesProps {
+  onCategoryClick: (categoryId: string) => void;
+  selectedCategory: string | null;
+}
+const Categories = ({ onCategoryClick, selectedCategory }: CategoriesProps) => {
   const [data, setData] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const fetchData = async () => {
@@ -26,7 +29,16 @@ const Categories = () => {
   return (
     <>
       {data.map((item) => (
-        <CardCategory image={item.image} title={item.name} />
+        <div key={item._id}>
+          <CardCategory
+            key={item._id}
+            id={item._id}
+            image={item.image}
+            title={item.name}
+            onCategoryClick={onCategoryClick}
+            isActive={selectedCategory === item._id}
+          />
+        </div>
       ))}
     </>
   );

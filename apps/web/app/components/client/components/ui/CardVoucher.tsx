@@ -19,15 +19,15 @@ const CardVoucher: React.FC<CardVoucherProps> = ({
         </div>
         <div className="">
           <h2 className="mb-2 text-lg font-bold">Discount {discount}%</h2>
-          <p className="mb-4 text-gray-700">
-            Use discount code to receive 10% off your order.
+          <p className="hidden mb-4 text-gray-700 lg:block">
+            Use discount code to receive {discount}% off your order.
           </p>
         </div>
         <div className="flex flex-col gap-2">
           <p>Point: {point}</p>
           <Button
             onClick={() => handleExchange(id)}
-            className="transition duration-100  bg-orange-600 hover:-translate-y-1  hover:bg-[#ee5733]"
+            className="  bg-orange-600 transition-all  hover:shadow-sm hover:transition-all hover:shadow-orange-700 hover:bg-[#ee5733]"
           >
             Exchange
           </Button>

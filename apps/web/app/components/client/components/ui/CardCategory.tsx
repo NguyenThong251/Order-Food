@@ -2,20 +2,35 @@ import Link from "next/link";
 import React from "react";
 import { Card, Image, Title, rem } from "@repo/ui";
 interface CardCategoryProps {
+  id: string;
   title: string;
   image: string;
+  onCategoryClick: (categoryId: string) => void;
+  isActive: boolean;
 }
-const CardCategory: React.FC<CardCategoryProps> = ({ title, image }) => {
+const CardCategory: React.FC<CardCategoryProps> = ({
+  id,
+  title,
+  image,
+  onCategoryClick,
+  isActive,
+}) => {
   return (
     <>
-      <Link href={title}>
-        <div className="flex items-center justify-center gap-3 p-1 duration-300 ease-in-out bg-white rounded-md shadow-md hover:-translate-y-1 hover:shadow-lg sm:justify-start hover:shadow-customOrange">
-          <div className="p-2 bg-gray-100 rounded-md 2/4">
-            <Image className="w-8 h-8 rounded-md" src={image} alt={title} />
-          </div>
-          <h2 className="hidden font-medium lg:block"> {title}</h2>
+      <div
+        onClick={() => onCategoryClick(id)}
+        className={`flex items-center justify-center gap-3  p-1  rounded-md shadow-lg sm:justify-start ${
+          isActive
+            ? "bg-customOrange text-white"
+            : " duration-300 ease-in-out bg-white shadow-md hover:-translate-y-1 hover:shadow-lg  hover:shadow-customOrange"
+        }`}
+      >
+        <div className="p-2 bg-gray-100 rounded-md 2/4">
+          <Image className="w-8 h-8 rounded-md" src={image} alt={title} />
         </div>
-        {/* <Card
+        <h2 className="hidden font-medium lg:block"> {title}</h2>
+      </div>
+      {/* <Card
           shadow="sm"
           radius="md"
           withBorder
@@ -32,7 +47,6 @@ const CardCategory: React.FC<CardCategoryProps> = ({ title, image }) => {
             {title}
           </Title>
         </Card> */}
-      </Link>
     </>
   );
 };

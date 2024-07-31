@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, Swal } from "@repo/ui";
 import CardVoucher from "../../../../components/client/components/ui/CardVoucher";
-import { User, Voucher } from "../../../../interface";
+import { User, UserID, Voucher } from "../../../../interface";
 import request from "../../../../utils/request";
 import { useUserStore } from "../../../../store";
 
@@ -37,14 +37,27 @@ const Page = () => {
     if (user && dataUser) {
       const voucher = dataVoucher.find((v) => v._id === id);
       if (voucher) {
+        const isVoucherUsed = voucher.users.some((u) => u.user_id === user._id);
+        if (isVoucherUsed) {
+          Swal.fire({
+            icon: "info",
+            title: "Voucher already redeemed",
+            text: "You have already redeemed this voucher.",
+          });
+          return;
+        }
         if (dataUser.point >= voucher.point) {
           const updatedUser = {
             ...dataUser,
             point: dataUser.point - voucher.point,
           };
+          const updatedVoucher = {
+            ...voucher,
+            users: [...voucher.users, { user_id: user._id }],
+          };
           try {
             await request.put(`users/${user._id}`, updatedUser);
-            console.log("Update response:", updatedUser.point);
+            await request.put(`vouchers/${voucher._id}`, updatedVoucher);
             const Toast = Swal.mixin({
               toast: true,
               position: "top-end",
@@ -76,6 +89,13 @@ const Page = () => {
           });
         }
       }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please login to redeem vouchers.",
+      });
+      return;
     }
   };
 
@@ -86,7 +106,7 @@ const Page = () => {
   }, []);
 
   return (
-    <div className="h-screen m-6 overflow-y-scroll bg-white rounded-md shadow-sm">
+    <div className="h-[85vh] m-6 overflow-y-scroll sm:overflow-y-hidden  bg-white rounded-md shadow-sm">
       <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3">
         {dataVoucher.map((voucher) => (
           <div key={voucher._id}>
