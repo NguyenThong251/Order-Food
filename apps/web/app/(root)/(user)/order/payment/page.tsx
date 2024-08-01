@@ -21,11 +21,12 @@ import {
   Voucher,
 } from "../../../../interface";
 import request from "../../../../utils/request";
-import { useOrderStore, useUserStore } from "../../../../store";
+import { useOrderStore, useTableStore, useUserStore } from "../../../../store";
 import CardVoucher from "../../../../components/client/components/ui/CardVoucher";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 const page = () => {
+  const router = useRouter();
   const { user } = useUserStore((state) => state);
   const [dataProduct, setDataProduct] = useState<
     (Products & { quantity: number })[]
@@ -35,18 +36,14 @@ const page = () => {
   const [dataVoucher, setDataVoucher] = useState<Voucher[]>([]);
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [dataArrayProduct, setArrayProducts] = useState<Products[]>([]);
-  const { orderId, setOrderId } = useOrderStore((state) => state);
-  // console.log(orderId);
+  const { orderId, setOrderId, clearOrderId } = useOrderStore((state) => state);
+  const tableId = useTableStore((state) => state._id);
+
   const fetchDataProductsCheckoutItem = async () => {
     try {
+      if (!orderId) return;
       const dataOrder = await request.get(`/order/${orderId}`);
-      // const dataOrderItem = dataOrder.data.filter(
-      //   (order: OrderData) => order.user_id === userId
-      // );
-      // console.log(dataOrder.data);
-
       const products = dataOrder.data?.products || [];
-
       const res = await Promise.all(
         products.map((item: OrderProduct) =>
           request.get(`products/${item.product_id}`).then((res) => ({
@@ -70,15 +67,14 @@ const page = () => {
     if (!user) return;
     try {
       const res = await request.get("/vouchers");
-      const voucherFilter = res.data.filter(
-        (voucher: Voucher) => voucher.users[0]?.user_id === user._id
+      const voucherFilter = res.data.filter((voucher: Voucher) =>
+        voucher.users.some((u) => u.user_id === user._id)
       );
       setDataVoucher(voucherFilter);
     } catch (err) {
       console.error("Error fetching voucher:", err);
     }
   };
-
   const handleExchange = async (id: string) => {
     const voucher = dataVoucher.find((v) => v._id === id);
     setVoucher(voucher || null);
@@ -100,68 +96,6 @@ const page = () => {
         title: "Voucher redeemed successfully",
       });
     }
-    // if (user && dataUser) {
-    //   if (voucher) {
-    //     const isVoucherUsed = voucher.users.some((u) => u.user_id === user._id);
-    //     if (isVoucherUsed) {
-    //       Swal.fire({
-    //         icon: "info",
-    //         title: "Voucher already redeemed",
-    //         text: "You have already redeemed this voucher.",
-    //       });
-    //       return;
-    //     }
-    //     if (dataUser.point >= voucher.point) {
-    //       const updatedUser = {
-    //         ...dataUser,
-    //         point: dataUser.point - voucher.point,
-    //       };
-    //       const updatedVoucher = {
-    //         ...voucher,
-    //         users: [...voucher.users, { user_id: user._id }],
-    //       };
-    //       try {
-    //         await request.put(`users/${user._id}`, updatedUser);
-    //         await request.put(`vouchers/${voucher._id}`, updatedVoucher);
-    //         const Toast = Swal.mixin({
-    //           toast: true,
-    //           position: "top-end",
-    //           showConfirmButton: false,
-    //           timer: 3000,
-    //           timerProgressBar: true,
-    //           didOpen: (toast) => {
-    //             toast.onmouseenter = Swal.stopTimer;
-    //             toast.onmouseleave = Swal.resumeTimer;
-    //           },
-    //         });
-    //         Toast.fire({
-    //           icon: "success",
-    //           title: "Voucher redeemed successfully",
-    //         });
-    //       } catch (error) {
-    //         console.error("Error updating user data:", error);
-    //         Swal.fire({
-    //           icon: "error",
-    //           title: "Oops...",
-    //           text: "Something went wrong!",
-    //         });
-    //       }
-    //     } else {
-    //       Swal.fire({
-    //         icon: "warning",
-    //         title: "Insufficient points",
-    //         text: `You need at least ${voucher.point} points to redeem this voucher.`,
-    //       });
-    //     }
-    //   }
-    // } else {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Oops...",
-    //     text: "Please login to redeem vouchers.",
-    //   });
-    //   return;
-    // }
   };
 
   const calculateSubtotal = () => {
@@ -173,6 +107,50 @@ const page = () => {
   const calculateTotal = (subtotal: number, discount: number) => {
     return subtotal - (subtotal * discount) / 100;
   };
+
+  const handleCheckout = async () => {
+    const dataBill = {
+      user_id: user ? user?._id : null,
+      products: dataProduct.map((product) => ({
+        product_id: product._id,
+        quantity: product.quantity,
+      })),
+      total: totalPrice,
+      table_id: tableId,
+      date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    };
+    try {
+      await request.post("/bill", dataBill);
+      if (user) {
+        const userDataId = await request.get(`/users/${user._id}`);
+        const currentPoints = userDataId.data.point || 0;
+        const pointsEarned = Math.floor(totalPrice / 100000) * 3;
+        await request.put(`/users/${user._id}`, {
+          ...userDataId,
+          point: currentPoints + pointsEarned,
+        });
+      }
+      if (voucher && user) {
+        const updatedUsers = voucher.users.filter(
+          (u) => u.user_id !== user._id
+        );
+        await request.put(`/vouchers/${voucher._id}`, {
+          ...voucher,
+          users: updatedUsers,
+        });
+      }
+      Swal.fire({
+        icon: "success",
+        title: "Order placed successfully",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      clearOrderId();
+      router.push("/order/dashboard");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const subTotal = calculateSubtotal();
   const discount = voucher ? voucher.discount : 0;
   const totalPrice = calculateTotal(subTotal, discount);
@@ -181,6 +159,7 @@ const page = () => {
     fetchDataProductsCheckoutItem();
     fetchDataVoucher();
   }, []);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -274,7 +253,11 @@ const page = () => {
               </div>
             </div>
 
-            <Button className="flex justify-center w-full gap-3" color="red">
+            <Button
+              onClick={handleCheckout}
+              className="flex justify-center w-full gap-3"
+              color="red"
+            >
               Checkout <TbBasketCheck className="text-xl ms-4" />
             </Button>
           </div>

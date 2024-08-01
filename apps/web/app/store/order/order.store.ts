@@ -9,8 +9,8 @@ export const useOrderStore = create<OrderState>()(
         clearOrderId: () => set({ orderId: null }),
       }),
       {
-        name: "order-storage", // Tên key trong localStorage
-        getStorage: () => localStorage, // Lưu trữ vào localStorage
+        name: "order-storage",
+        getStorage: () => localStorage,
       }
     )
   )
