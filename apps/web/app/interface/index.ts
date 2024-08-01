@@ -6,3 +6,4 @@ export * from "./table.interface";
 export * from "./order.interface";
 export * from "./orderchef.interface";
 export * from "./voucher.interface";
+export * from "./bill.interface";

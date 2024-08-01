@@ -4,9 +4,10 @@ export interface Product {
 }
 
 export interface Bill {
+  _id: string;
   products: Product[];
   user_id: string;
   total: number;
   table_id: string;
-  date: Date;
+  date: string;
 }

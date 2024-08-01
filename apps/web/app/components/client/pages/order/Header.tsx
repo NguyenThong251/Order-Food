@@ -31,6 +31,7 @@ import { Category } from "../../../../interface";
 import request from "../../../../utils/request";
 import { useCartStore, useUserStore } from "../../../../store";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const dataNavbar = {
   items: [
@@ -58,6 +59,7 @@ const dataNavbar = {
   ],
 };
 const Header = () => {
+  const router = useRouter()
   const { user, clearUser } = useUserStore((state) => state);
   const [menuOpened, { toggle: toggleMenu, open: openMenu, close: closeMenu }] =
     useDisclosure();
@@ -89,7 +91,10 @@ const Header = () => {
     fetchCategories();
   }, []);
   const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
-
+const handleLogout = () => {
+  router.push('/order/dashboard')
+  clearUser()
+}
   return (
     <>
       {/* MODAL NAV*/}
@@ -189,7 +194,7 @@ const Header = () => {
                     </Menu.Item>
                     <Menu.Divider />
                     <Menu.Item
-                      onClick={clearUser}
+                      onClick={handleLogout}
                       leftSection={
                         <TbLogin style={{ width: rem(14), height: rem(14) }} />
                       }
