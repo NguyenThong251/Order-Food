@@ -10,4 +10,5 @@ export interface Bill {
   total: number;
   table_id: string;
   date: string;
+  status: "Pending Payment" | "Paid";
 }

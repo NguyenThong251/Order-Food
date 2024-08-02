@@ -1,11 +1,18 @@
 "use client";
-import { Modal, Pagination, useDisclosure, useEffect, useState } from "@repo/ui";
-import { OrderData, Products,Bill } from "../../../../../interface";
+import {
+  Modal,
+  Pagination,
+  useDisclosure,
+  useEffect,
+  useState,
+} from "@repo/ui";
+import { OrderData, Products, Bill, Table } from "../../../../../interface";
 import request from "../../../../../utils/request";
 import TableItem from "../../../components/ui/TableItem";
 import { useUserStore } from "../../../../../store";
 
-const Table = () => {
+const Tables = () => {
+  const [tableData, setTableData] = useState<Table | null>(null);
   const [dataBill, setDataBill] = useState<Bill[]>([]);
   const user = useUserStore((state) => state.user);
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
@@ -29,41 +36,83 @@ const Table = () => {
       const products = await Promise.all(
         bill.products.map(async (product) => {
           const response = await request.get(`/products/${product.product_id}`);
-          return { ...response.data, quantity: product.quantity };
+          return { ...response.data[0], quantity: product.quantity };
         })
       );
-      console.log(products.map(product =>product.quantity))
+
       setProductDetails(products);
     } catch (error) {
       console.error(error);
     }
   };
-  const handleView = async(billId: Bill) => {
-    setSelectedBill(billId);
-  fetchProductDetails(billId);
+  const fetchTableData = async (tableId: string) => {
+    try {
+      const response = await request.get(`/table/${tableId}`);
+      setTableData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleView = async (bill: Bill) => {
+    setSelectedBill(bill);
+    fetchTableData(bill.table_id);
+    fetchProductDetails(bill);
     open();
   };
   useEffect(() => {
     fetchDataBill();
-    
   }, []);
   return (
     <>
-     <Modal opened={opened} onClose={close} title="Bill Details">
-        {selectedBill && (
-          <div>
-            <p>ID: {selectedBill._id}</p>
-            <p>Date: {new Date(selectedBill.date).toLocaleDateString()}</p>
-            <p>Total: {selectedBill.total.toLocaleString()} VNĐ</p>
-            <p>Quantity: {selectedBill.products.reduce((sum, product) => sum + product.quantity, 0)}</p>
-            <h3>Products:</h3>
-            <ul>
+      <Modal opened={opened} onClose={close} title="Bill Details">
+        {selectedBill && tableData && (
+          <div className="p-6 space-y-4 bg-white rounded-lg dark:bg-neutral-800">
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+              ID: {selectedBill._id}
+            </p>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+              Date: {new Date(selectedBill.date).toLocaleDateString()}
+            </p>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+              Total: {selectedBill.total.toLocaleString()} VNĐ
+            </p>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+              Table: {tableData.name}
+            </p>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+              Quantity:{" "}
+              {selectedBill.products.reduce(
+                (sum, product) => sum + product.quantity,
+                0
+              )}
+            </p>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
+              Products:
+            </h3>
+            <ul className="space-y-2">
               {productDetails.map((product: Products) => (
-                <li key={product._id}>
-                  {product.name}: {product.quantity}
+                <li
+                  key={product._id}
+                  className="flex justify-between p-2 bg-gray-100 rounded dark:bg-neutral-700"
+                >
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    {product.name}
+                  </span>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    x {product.quantity}
+                  </span>
                 </li>
               ))}
             </ul>
+            <p
+              className={`py-2 text-lg font-semibold text-center text-white rounded-lg ${
+                selectedBill.status === "Pending Payment"
+                  ? "bg-red-400"
+                  : "bg-green-400"
+              } dark:text-gray-300`}
+            >
+              {selectedBill.status}
+            </p>
           </div>
         )}
       </Modal>
@@ -90,18 +139,30 @@ const Table = () => {
                       scope="col"
                       className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-start dark:text-neutral-500"
                     >
+                      TABLE
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-start dark:text-neutral-500"
+                    >
                       TOTAL
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-center dark:text-neutral-500"
+                      className="px-6 py-3 text-xs font-medium text-center text-gray-500 uppercase dark:text-neutral-500"
                     >
                       QUANTITY
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-xs font-medium text-center text-gray-500 uppercase dark:text-neutral-500"
+                    >
+                      STATUS
                     </th>
 
                     <th
                       scope="col"
-                      className="px-6 py-3 text-xs text-end font-medium text-gray-500 uppercase dark:text-neutral-500"
+                      className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-end dark:text-neutral-500"
                     >
                       ACTION
                     </th>
@@ -109,14 +170,19 @@ const Table = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
                   {dataBill.map((bill) => (
-                   <TableItem
-                   key={bill._id}
-                   _id={bill._id}
-                   date={new Date(bill.date).toLocaleDateString()}
-                   quantity={bill.products.reduce((sum, product) => sum + product.quantity, 0)}
-                   total={bill.total}
-                   handleView={() => handleView(bill)}
-                 />
+                    <TableItem
+                      key={bill._id}
+                      _id={bill._id}
+                      date={new Date(bill.date).toLocaleDateString()}
+                      quantity={bill.products.reduce(
+                        (sum, product) => sum + product.quantity,
+                        0
+                      )}
+                      table={bill.table_id}
+                      status={bill.status}
+                      total={bill.total}
+                      handleView={() => handleView(bill)}
+                    />
                   ))}
                 </tbody>
               </table>
@@ -128,4 +194,4 @@ const Table = () => {
   );
 };
 
-export default Table;
+export default Tables;
