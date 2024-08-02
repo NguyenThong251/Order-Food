@@ -7,7 +7,7 @@ import {
   IconUser,
   Tabs,
 } from "@repo/ui";
-import Voucher from "../../../../components/client/pages/setting/Voucher";
+import Vouchers from "../../../../components/client/pages/setting/Voucher";
 import UserPage from "../../../../components/client/pages/setting/User";
 
 const page = () => {
@@ -35,7 +35,7 @@ const page = () => {
             </Tabs.Panel>
 
             <Tabs.Panel value="yourvoucher">
-              <Voucher />
+              <Vouchers />
             </Tabs.Panel>
           </Tabs>
         </div>

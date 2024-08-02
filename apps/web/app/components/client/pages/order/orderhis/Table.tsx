@@ -1,23 +1,24 @@
 "use client";
-import {
-  Modal,
-  Pagination,
-  useDisclosure,
-  useEffect,
-  useState,
-} from "@repo/ui";
+import { useState, useEffect } from "@repo/ui";
 import { OrderData, Products, Bill, Table } from "../../../../../interface";
 import request from "../../../../../utils/request";
 import TableItem from "../../../components/ui/TableItem";
 import { useUserStore } from "../../../../../store";
+import { Modal, useDisclosure } from "@repo/ui";
 
-const Tables = () => {
+interface TablesProps {
+  startDate: string;
+  endDate: string;
+}
+
+const Tables: React.FC<TablesProps> = ({ startDate, endDate }) => {
   const [tableData, setTableData] = useState<Table | null>(null);
   const [dataBill, setDataBill] = useState<Bill[]>([]);
   const user = useUserStore((state) => state.user);
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [productDetails, setProductDetails] = useState<Products[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
+
   const fetchDataBill = async () => {
     try {
       const response = await request.get("/bill");
@@ -25,12 +26,19 @@ const Tables = () => {
         const billIdUser = response.data.filter(
           (item: Bill) => item.user_id === user._id
         );
-        setDataBill(billIdUser);
+        const filteredBills = billIdUser.filter((bill: Bill) => {
+          const billDate = new Date(bill.date).getTime();
+          const start = startDate ? new Date(startDate).getTime() : -Infinity;
+          const end = endDate ? new Date(endDate).getTime() : Infinity;
+          return billDate >= start && billDate <= end;
+        });
+        setDataBill(filteredBills);
       }
     } catch (error) {
       console.error(error);
     }
   };
+
   const fetchProductDetails = async (bill: Bill) => {
     try {
       const products = await Promise.all(
@@ -39,12 +47,12 @@ const Tables = () => {
           return { ...response.data[0], quantity: product.quantity };
         })
       );
-
       setProductDetails(products);
     } catch (error) {
       console.error(error);
     }
   };
+
   const fetchTableData = async (tableId: string) => {
     try {
       const response = await request.get(`/table/${tableId}`);
@@ -53,15 +61,18 @@ const Tables = () => {
       console.error(error);
     }
   };
+
   const handleView = async (bill: Bill) => {
     setSelectedBill(bill);
     fetchTableData(bill.table_id);
     fetchProductDetails(bill);
     open();
   };
+
   useEffect(() => {
     fetchDataBill();
-  }, []);
+  }, [startDate, endDate]);
+
   return (
     <>
       <Modal opened={opened} onClose={close} title="Bill Details">

@@ -19,6 +19,7 @@ import {
   FiCheckCircle,
   useState,
   FiAlertCircle,
+  Swal,
 } from "@repo/ui";
 import { GoogleButton } from "../components/ui/GoogleButton";
 import { TwitterButton } from "../components/ui/TwitterButton";
@@ -26,8 +27,10 @@ import Link from "next/link";
 import request from "../../../utils/request";
 import Notification from "../components/ui/Notification";
 import { User } from "../../../interface";
+import { useRouter } from "next/navigation";
 
 export function RegisterForm(props: PaperProps) {
+  const router = useRouter();
   const [notification, setNotification] = useState<{
     title: string;
     message: string;
@@ -73,12 +76,20 @@ export function RegisterForm(props: PaperProps) {
           user.phone === values.phone || user.email === values.email
       );
       if (existingUser) {
-        // User already exists
-        setNotification({
-          title: "Error",
-          message: "Email or phone number already exists.",
-          color: "red",
-          icon: <FiAlertCircle size={18} />,
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+        Toast.fire({
+          icon: "error",
+          title: "Email or phone number already exists.",
         });
         return;
       }
@@ -86,12 +97,22 @@ export function RegisterForm(props: PaperProps) {
 
       const res = await request.post("/users", data);
       if (res.status === 201) {
-        setNotification({
-          title: "Success",
-          message: "You have successfully signed up!",
-          color: "teal",
-          icon: <FiCheckCircle size={18} />,
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
         });
+        Toast.fire({
+          icon: "success",
+          title: "Successfully signed up!",
+        });
+        router.push("/auth/login");
         form.reset();
       }
     } catch (err) {
