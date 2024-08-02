@@ -18,6 +18,7 @@ import {
   FiAlertCircle,
   FiCheckCircle,
   bcrypt,
+  Swal,
 } from "@repo/ui";
 
 import Link from "next/link";
@@ -30,7 +31,9 @@ import { useUserStore } from "../../../store";
 
 export function LoginForm(props: PaperProps) {
   const { setUser } = useUserStore((state) => state);
+
   const router = useRouter();
+
   const [notification, setNotification] = useState<{
     title: string;
     message: string;
@@ -74,31 +77,60 @@ export function LoginForm(props: PaperProps) {
       const isPasswordMatch = await bcrypt.compare(password, user.password);
 
       if (!isPasswordMatch) {
-        setNotification({
-          title: "Error",
-          message: "Incorrect password.",
-          color: "red",
-          icon: <FiAlertCircle size={18} />,
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
         });
+        Toast.fire({
+          icon: "error",
+          title: "Incorrect password.",
+        });
+
         return;
       }
 
-      // Success: Redirect or show success notification
-      setNotification({
-        title: "Success",
-        message: "Login successful!",
-        color: "teal",
-        icon: <FiCheckCircle size={18} />,
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
       });
+      Toast.fire({
+        icon: "success",
+        title: "Login successful!",
+      });
+
+      form.reset();
+
       router.push("/order/dashboard");
       setUser(user);
     } catch (error) {
-      console.error(error);
-      setNotification({
-        title: "Error",
-        message: "An error occurred. Please try again.",
-        color: "red",
-        icon: <FiAlertCircle size={18} />,
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      Toast.fire({
+        icon: "error",
+        title: "An error occurred. Please try again.",
       });
     }
   };

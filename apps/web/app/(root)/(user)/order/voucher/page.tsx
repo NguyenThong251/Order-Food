@@ -95,6 +95,7 @@ const Page = () => {
         title: "Oops...",
         text: "Please login to redeem vouchers.",
       });
+
       return;
     }
   };

@@ -18,6 +18,7 @@ import {
   useEffect,
   useState,
 } from "@repo/ui";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Category } from "../../../../interface";
@@ -25,7 +26,6 @@ import { useCartStore, useUserStore } from "../../../../store";
 import request from "../../../../utils/request";
 import NavbarMobile from "./NavBarMobile";
 import Order from "./dashboard/Order";
-
 const dataNavbar = {
   items: [
     {
@@ -49,6 +49,7 @@ const dataNavbar = {
       label: "Payment",
       href: "/order/payment",
     },
+
     {
       icons: "TbSettings" as const,
       label: "Setting",
@@ -172,24 +173,28 @@ const Header = () => {
                     >
                       {user?.username}
                     </Menu.Item>
-                    <Menu.Item
-                      leftSection={
-                        <IconSettings
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      }
-                    >
-                      Settings
-                    </Menu.Item>
-                    <Menu.Item
-                      leftSection={
-                        <TbReceipt
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      }
-                    >
-                      Order
-                    </Menu.Item>
+                    <Link href="/order/setting">
+                      <Menu.Item
+                        leftSection={
+                          <IconSettings
+                            style={{ width: rem(14), height: rem(14) }}
+                          />
+                        }
+                      >
+                        Settings
+                      </Menu.Item>
+                    </Link>
+                    <Link href="/order/history">
+                      <Menu.Item
+                        leftSection={
+                          <TbReceipt
+                            style={{ width: rem(14), height: rem(14) }}
+                          />
+                        }
+                      >
+                        Order History
+                      </Menu.Item>
+                    </Link>
                     <Menu.Divider />
                     <Menu.Item
                       onClick={handleLogout}
