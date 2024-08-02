@@ -1,37 +1,30 @@
 import {
   Avatar,
   Burger,
-  Button,
   Drawer,
-  IconMessageCircle,
   IconSettings,
   Image,
   Indicator,
   Menu,
   Modal,
   rem,
-  TbFilterPlus,
   TbLogin,
   TbLogout,
   TbReceipt,
   TbShoppingCart,
   TbUser,
   TbUserPlus,
-  TbZoom,
-  Text,
-  TextInput,
   useDisclosure,
   useEffect,
   useState,
 } from "@repo/ui";
-import NavbarMobile from "./NavBarMobile";
-import Order from "./dashboard/Order";
-import ProductFilter from "../../components/modal/modal-filter";
-import { Category } from "../../../../interface";
-import request from "../../../../utils/request";
-import { useCartStore, useUserStore } from "../../../../store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Category } from "../../../../interface";
+import { useCartStore, useUserStore } from "../../../../store";
+import request from "../../../../utils/request";
+import NavbarMobile from "./NavBarMobile";
+import Order from "./dashboard/Order";
 
 const dataNavbar = {
   items: [
@@ -56,10 +49,15 @@ const dataNavbar = {
       label: "Payment",
       href: "/order/payment",
     },
+    {
+      icons: "TbSettings" as const,
+      label: "Setting",
+      href: "/order/setting",
+    },
   ],
 };
 const Header = () => {
-  const router = useRouter()
+  const router = useRouter();
   const { user, clearUser } = useUserStore((state) => state);
   const [menuOpened, { toggle: toggleMenu, open: openMenu, close: closeMenu }] =
     useDisclosure();
@@ -91,10 +89,10 @@ const Header = () => {
     fetchCategories();
   }, []);
   const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
-const handleLogout = () => {
-  router.push('/order/dashboard')
-  clearUser()
-}
+  const handleLogout = () => {
+    router.push("/order/dashboard");
+    clearUser();
+  };
   return (
     <>
       {/* MODAL NAV*/}

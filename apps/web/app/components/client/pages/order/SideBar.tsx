@@ -36,6 +36,11 @@ const dataNavbar = {
       label: "Payment",
       href: "/order/payment",
     },
+    {
+      icons: "TbSettings" as const,
+      label: "Settting",
+      href: "/order/setting",
+    },
   ],
 };
 const NoSSRLink = dynamic(() => import("next/link"), { ssr: false });

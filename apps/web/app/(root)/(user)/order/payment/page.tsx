@@ -118,6 +118,7 @@ const page = () => {
       total: totalPrice,
       table_id: tableId,
       date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+      status: "Pending Payment",
     };
     try {
       await request.post("/bill", dataBill);
@@ -186,19 +187,18 @@ const page = () => {
             />
           )
         ) : (
-          <div className="">
-            <div className="text-2xl font-bold text-center text-customOrange ">
-              You need register/login to receive voucher
+          <div>
+            <div className="text-2xl font-bold text-center text-customOrange">
+              You need to register/login to receive a voucher
             </div>
             <div className="flex justify-between gap-3 mt-10">
               <Link className="w-full" href="/auth/signup">
                 <Button className="w-full" variant="outline" color="red">
                   Register
-                </Button>{" "}
+                </Button>
               </Link>
               <Link className="w-full" href="/auth/login">
                 <Button className="w-full" color="red">
-                  {" "}
                   Login
                 </Button>
               </Link>
@@ -206,65 +206,116 @@ const page = () => {
           </div>
         )}
       </Modal>
-      <div className="flex flex-col gap-4 justify-between h-[92vh] p-6 md:flex-row ">
-        <div className="w-full h-[92vh] overflow-y-auto sm:overflow-y-hidden md:w-2/3">
-          <div className="grid grid-cols-1 gap-2 p-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {dataProduct.flat().map((item) => (
-              <CardCheckout
-                key={item._id}
-                _id={item._id}
-                thumbnails={item.thumbnails}
-                name={item.name}
-                price={item.price}
-                description={item.description}
-                seller={item.seller}
-                quantity={item.quantity}
-                category={item.category}
-              />
-            ))}
+      {dataProduct.length > 0 ? (
+        <>
+          <div className="flex flex-col gap-4 justify-between h-[92vh] p-6 md:flex-row">
+            <div className="w-full h-[92vh] overflow-y-auto sm:overflow-y-hidden md:w-2/3">
+              <div className="grid grid-cols-1 gap-2 p-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {dataProduct.flat().map((item) => (
+                  <CardCheckout
+                    key={item._id}
+                    _id={item._id}
+                    thumbnails={item.thumbnails}
+                    name={item.name}
+                    price={item.price}
+                    description={item.description}
+                    seller={item.seller}
+                    quantity={item.quantity}
+                    category={item.category}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="w-full rounded-lg md:w-1/3">
+              <div className="flex flex-col gap-3 p-4 bg-white rounded-md">
+                <div>
+                  <Button
+                    onClick={open}
+                    className="flex items-center justify-center w-full gap-3 lg:w-1/3"
+                  >
+                    <TbCopyPlus className="text-lg me-3" /> Add Voucher
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-md">Subtotal:</div>
+                  <div className="font-semibold text-md">
+                    {subTotal.toLocaleString()} VNĐ
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-md">Offer:</div>
+                  <div className="font-semibold text-md">
+                    {voucher ? `${voucher.discount}%` : "0%"}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between border-t-2">
+                  <div className="text-xl">Total:</div>
+                  <div className="text-lg font-semibold">
+                    {totalPrice.toLocaleString()} VNĐ
+                  </div>
+                </div>
+                <Button
+                  onClick={handleCheckout}
+                  className="flex justify-center w-full gap-3"
+                  color="red"
+                >
+                  Checkout <TbBasketCheck className="text-xl ms-4" />
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="w-full rounded-lg md:w-1/3 ">
-          <div className="flex flex-col gap-3 p-4 bg-white rounded-md">
-            <div className="">
+        </>
+      ) : (
+        <>
+          <div className="flex items-center justify-center mt-10">
+            <Image
+              className=" w-96 h-96"
+              src="https://static.thenounproject.com/png/5733136-200.png"
+            />
+          </div>
+        </>
+      )}
+      {/* {dataProduct.length > 0 ? (
+          <div className="w-full rounded-lg md:w-1/3">
+            <div className="flex flex-col gap-3 p-4 bg-white rounded-md">
+              <div>
+                <Button
+                  onClick={open}
+                  className="flex items-center justify-center w-full gap-3 lg:w-1/3"
+                >
+                  <TbCopyPlus className="text-lg me-3" /> Add Voucher
+                </Button>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-md">Subtotal:</div>
+                <div className="font-semibold text-md">
+                  {subTotal.toLocaleString()} VNĐ
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-md">Offer:</div>
+                <div className="font-semibold text-md">
+                  {voucher ? `${voucher.discount}%` : "0%"}
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-t-2">
+                <div className="text-xl">Total:</div>
+                <div className="text-lg font-semibold">
+                  {totalPrice.toLocaleString()} VNĐ
+                </div>
+              </div>
               <Button
-                onClick={open}
-                className="flex items-center justify-center w-full gap-3 lg:w-1/3"
+                onClick={handleCheckout}
+                className="flex justify-center w-full gap-3"
+                color="red"
               >
-                <TbCopyPlus className="text-lg me-3" /> Add Voucher
+                Checkout <TbBasketCheck className="text-xl ms-4" />
               </Button>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="text-md ">Subtotal:</div>
-              <div className="font-semibold text-md">
-                {subTotal.toLocaleString()} VNĐ
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="text-md ">Offer:</div>
-              <div className="font-semibold text-md">
-                {voucher ? `${voucher.discount}%` : "0%"}
-              </div>
-            </div>
-            <div className="flex items-center justify-between border-t-2">
-              <div className="text-xl ">Total:</div>
-              <div className="text-lg font-semibold">
-                {totalPrice.toLocaleString()} VNĐ
-              </div>
-            </div>
-
-            <Button
-              onClick={handleCheckout}
-              className="flex justify-center w-full gap-3"
-              color="red"
-            >
-              Checkout <TbBasketCheck className="text-xl ms-4" />
-            </Button>
           </div>
-        </div>
-      </div>
-
-      {/* <Order /> */}
+        ) : (
+          <></>
+        )} */}
     </>
   );
 };
