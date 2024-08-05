@@ -120,7 +120,7 @@ const page = () => {
       data.filter((product) => product.category._id === categoryId)
     );
   };
-  const productsPerPage = 10;
+  const productsPerPage = 5;
   const pages = chunk(filteredData, productsPerPage);
   if (loading) {
     return <div>Loading...</div>;
