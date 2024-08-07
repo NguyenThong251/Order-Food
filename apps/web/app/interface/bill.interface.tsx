@@ -7,6 +7,7 @@ export interface Bill {
   _id: string;
   products: Product[];
   user_id: string;
+  sub_total: number;
   total: number;
   table_id: string;
   date: string;
