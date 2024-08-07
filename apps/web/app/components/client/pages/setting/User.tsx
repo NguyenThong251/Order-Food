@@ -12,6 +12,7 @@ import { User } from "../../../../interface";
 import { useUserStore } from "../../../../store";
 import request from "../../../../utils/request";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 
 const UserPage = () => {
   const [dataUser, setDataUser] = useState<User | null>(null);
@@ -204,4 +205,6 @@ const UserPage = () => {
   );
 };
 
-export default UserPage;
+// export default UserPage;
+
+export default dynamic(() => Promise.resolve(UserPage), { ssr: false });

@@ -1,3 +1,7 @@
+export interface UserVoucher {
+  code: String;
+  voucher_id: string;
+}
 export interface User {
   _id: string;
   username: string;
@@ -6,6 +10,7 @@ export interface User {
   email: string;
   password: string;
   point: number;
+  vouchers: UserVoucher[];
 }
 export interface Action {
   user: User | null;

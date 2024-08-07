@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, Swal } from "@repo/ui";
 import CardVoucher from "../../../../components/client/components/ui/CardVoucher";
-import { User, UserID, Voucher } from "../../../../interface";
+import { User, UserVoucher, Voucher } from "../../../../interface";
 import request from "../../../../utils/request";
 import { useUserStore } from "../../../../store";
 
@@ -31,13 +31,22 @@ const Page = () => {
       }
     }
   };
+  const generateVoucherCode = () => {
+    return `KM${Math.floor(Math.random() * 1000000)
+      .toString()
+      .padStart(6, "0")}`;
+  };
 
   // Hàm xử lý đổi voucher
   const handleExchange = async (id: string) => {
     if (user && dataUser) {
       const voucher = dataVoucher.find((v) => v._id === id);
       if (voucher) {
-        const isVoucherUsed = voucher.users.some((u) => u.user_id === user._id);
+        // const isVoucherUsed = voucher.users.some((u) => u.user_id === user._id);
+        // const isVoucherUsed = dataUser.vouchers.includes(voucher._id);
+        const isVoucherUsed = dataUser.vouchers.some(
+          (v) => v.voucher_id === id
+        );
         if (isVoucherUsed) {
           Swal.fire({
             icon: "info",
@@ -47,14 +56,37 @@ const Page = () => {
           return;
         }
         if (dataUser.point >= voucher.point) {
+          const newVoucherCode = generateVoucherCode();
+          const newUserVoucher: UserVoucher = {
+            voucher_id: voucher._id,
+            code: newVoucherCode,
+          };
           const updatedUser = {
             ...dataUser,
             point: dataUser.point - voucher.point,
+            vouchers: [...dataUser.vouchers, newUserVoucher],
           };
+          console.log(newUserVoucher);
           const updatedVoucher = {
             ...voucher,
-            users: [...voucher.users, { user_id: user._id }],
+            codeVoucher: [
+              ...voucher.codeVoucher,
+              {
+                code: newVoucherCode,
+                redeemedAt: new Date(),
+                status: "unused",
+              },
+            ],
           };
+          console.log(updatedVoucher);
+          // console.log(...dataUser.vouchers, newVoucherCode);
+          // const updatedVoucher = {
+          //   ...voucher,
+          //   users: [
+          //     ...voucher.users,
+          //     { user_id: user._id, redeemedAt: new Date() },
+          //   ],
+          // };
           try {
             await request.put(`users/${user._id}`, updatedUser);
             await request.put(`vouchers/${voucher._id}`, updatedVoucher);
@@ -73,6 +105,7 @@ const Page = () => {
               icon: "success",
               title: "Voucher redeemed successfully",
             });
+            fetchDataUser();
           } catch (error) {
             console.error("Error updating user data:", error);
             Swal.fire({
