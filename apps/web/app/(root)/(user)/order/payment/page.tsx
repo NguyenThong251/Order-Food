@@ -7,6 +7,7 @@ import {
   Swal,
   TbBasketCheck,
   TbCopyPlus,
+  TbPhone,
   useDisclosure,
   useEffect,
   useState,
@@ -63,40 +64,40 @@ const page = () => {
       setLoading(false);
     }
   };
-  const fetchDataVoucher = async () => {
-    if (!user) return;
-    try {
-      const res = await request.get("/vouchers");
-      const voucherFilter = res.data.filter((voucher: Voucher) =>
-        voucher.users.some((u) => u.user_id === user._id)
-      );
-      setDataVoucher(voucherFilter);
-    } catch (err) {
-      console.error("Error fetching voucher:", err);
-    }
-  };
-  const handleExchange = async (id: string) => {
-    const voucher = dataVoucher.find((v) => v._id === id);
-    setVoucher(voucher || null);
-    if (voucher) {
-      close();
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Voucher redeemed successfully",
-      });
-    }
-  };
+  // const fetchDataVoucher = async () => {
+  //   if (!user) return;
+  //   try {
+  //     const res = await request.get("/vouchers");
+  //     const voucherFilter = res.data.filter((voucher: Voucher) =>
+  //       voucher.users.some((u) => u.user_id === user._id)
+  //     );
+  //     setDataVoucher(voucherFilter);
+  //   } catch (err) {
+  //     console.error("Error fetching voucher:", err);
+  //   }
+  // };
+  // const handleExchange = async (id: string) => {
+  //   const voucher = dataVoucher.find((v) => v._id === id);
+  //   setVoucher(voucher || null);
+  //   if (voucher) {
+  //     close();
+  //     const Toast = Swal.mixin({
+  //       toast: true,
+  //       position: "top-end",
+  //       showConfirmButton: false,
+  //       timer: 3000,
+  //       timerProgressBar: true,
+  //       didOpen: (toast) => {
+  //         toast.onmouseenter = Swal.stopTimer;
+  //         toast.onmouseleave = Swal.resumeTimer;
+  //       },
+  //     });
+  //     Toast.fire({
+  //       icon: "success",
+  //       title: "Voucher redeemed successfully",
+  //     });
+  //   }
+  // };
 
   const calculateSubtotal = () => {
     return dataProduct.reduce(
@@ -108,46 +109,66 @@ const page = () => {
     return subtotal - (subtotal * discount) / 100;
   };
 
-  const handleCheckout = async () => {
-    const dataBill = {
-      user_id: user ? user?._id : null,
-      products: dataProduct.map((product) => ({
-        product_id: product._id,
-        quantity: product.quantity,
-      })),
-      total: totalPrice,
-      table_id: tableId,
-      date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
-      status: "Pending Payment",
-    };
+  // const handleCheckout = async () => {
+  //   const dataBill = {
+  //     user_id: user ? user?._id : null,
+  //     products: dataProduct.map((product) => ({
+  //       product_id: product._id,
+  //       quantity: product.quantity,
+  //     })),
+  //     total: totalPrice,
+  //     table_id: tableId,
+  //     date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+  //     status: "Pending Payment",
+  //   };
+  //   try {
+  //     await request.post("/bill", dataBill);
+  //     if (user) {
+  //       const userDataId = await request.get(`/users/${user._id}`);
+  //       const currentPoints = userDataId.data.point || 0;
+  //       const pointsEarned = Math.floor(totalPrice / 100000) * 3;
+  //       await request.put(`/users/${user._id}`, {
+  //         ...userDataId,
+  //         point: currentPoints + pointsEarned,
+  //       });
+  //     }
+  //     // if (voucher && user) {
+  //     //   const updatedUsers = voucher.users.filter(
+  //     //     (u) => u.user_id !== user._id
+  //     //   );
+  //     //   await request.put(`/vouchers/${voucher._id}`, {
+  //     //     ...voucher,
+  //     //     users: updatedUsers,
+  //     //   });
+  //     // }
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Order placed successfully",
+  //       showConfirmButton: false,
+  //       timer: 1500,
+  //     });
+  //     clearOrderId();
+  //     router.push("/order/dashboard");
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  const handleCallPayment = async () => {
+    if (!orderId || !user) return;
+    console.log(orderId, user._id);
     try {
-      await request.post("/bill", dataBill);
-      if (user) {
-        const userDataId = await request.get(`/users/${user._id}`);
-        const currentPoints = userDataId.data.point || 0;
-        const pointsEarned = Math.floor(totalPrice / 100000) * 3;
-        await request.put(`/users/${user._id}`, {
-          ...userDataId,
-          point: currentPoints + pointsEarned,
-        });
-      }
-      if (voucher && user) {
-        const updatedUsers = voucher.users.filter(
-          (u) => u.user_id !== user._id
-        );
-        await request.put(`/vouchers/${voucher._id}`, {
-          ...voucher,
-          users: updatedUsers,
-        });
-      }
+      await request.post("/notify", {
+        order_id: orderId,
+        user_id: user._id,
+      });
       Swal.fire({
         icon: "success",
-        title: "Order placed successfully",
+        title: "You wait a moment",
         showConfirmButton: false,
         timer: 1500,
       });
-      clearOrderId();
-      router.push("/order/dashboard");
+      // clearOrderId();
+      // router.push("/order/dashboard");
     } catch (error) {
       console.log(error);
     }
@@ -158,7 +179,7 @@ const page = () => {
   useEffect(() => {
     // fetchProduct();
     fetchDataProductsCheckoutItem();
-    fetchDataVoucher();
+    // fetchDataVoucher();
   }, []);
 
   if (loading) {
@@ -167,7 +188,7 @@ const page = () => {
 
   return (
     <>
-      <Modal opened={opened} centered onClose={close} title="Your Voucher">
+      {/* <Modal opened={opened} centered onClose={close} title="Your Voucher">
         {user ? (
           dataVoucher.length > 0 ? (
             dataVoucher.map((voucher) => (
@@ -205,7 +226,7 @@ const page = () => {
             </div>
           </div>
         )}
-      </Modal>
+      </Modal> */}
       {dataProduct.length > 0 ? (
         <>
           <div className="flex flex-col gap-4 justify-between h-[92vh] p-6 md:flex-row">
@@ -228,38 +249,47 @@ const page = () => {
             </div>
             <div className="w-full rounded-lg md:w-1/3">
               <div className="flex flex-col gap-3 p-4 bg-white rounded-md">
-                <div>
+                {/* <div>
                   <Button
                     onClick={open}
                     className="flex items-center justify-center w-full gap-3 lg:w-1/3"
                   >
                     <TbCopyPlus className="text-lg me-3" /> Add Voucher
                   </Button>
-                </div>
-                <div className="flex items-center justify-between">
+                </div> */}
+                {/* <div className="flex items-center justify-between">
                   <div className="text-md">Subtotal:</div>
                   <div className="font-semibold text-md">
                     {subTotal.toLocaleString()} VNĐ
                   </div>
-                </div>
-                <div className="flex items-center justify-between">
+                </div> */}
+                {/* <div className="flex items-center justify-between">
                   <div className="text-md">Offer:</div>
                   <div className="font-semibold text-md">
                     {voucher ? `${voucher.discount}%` : "0%"}
                   </div>
-                </div>
-                <div className="flex items-center justify-between border-t-2">
+                </div> */}
+                <div className="flex items-center justify-between ">
                   <div className="text-xl">Total:</div>
                   <div className="text-lg font-semibold">
-                    {totalPrice.toLocaleString()} VNĐ
+                    {subTotal.toLocaleString()} VNĐ
                   </div>
                 </div>
-                <Button
+                {/* <Button
                   onClick={handleCheckout}
                   className="flex justify-center w-full gap-3"
                   color="red"
                 >
                   Checkout <TbBasketCheck className="text-xl ms-4" />
+                </Button> */}
+                <Button
+                  onClick={handleCallPayment}
+                  className="flex justify-center w-full gap-3"
+                  color="red"
+                >
+                  {" "}
+                  <TbPhone className="text-xl me-4" />
+                  Call Payment
                 </Button>
               </div>
             </div>

@@ -16,6 +16,7 @@ import {
 } from "@repo/ui";
 import React from "react";
 import CardNoti from "../components/ui/CardNoti";
+import Notify from "../components/Notify";
 
 const Header = () => {
   return (
@@ -40,21 +41,7 @@ const Header = () => {
           </div>
           <div className="nav-right ">
             <ul className="flex items-center p-0 m-0 header-right">
-              <Menu shadow="md" width={200}>
-                <Menu.Target>
-                  <Indicator inline label="2" size={16}>
-                    <li className="w-10 h-10 bg-[#f4f5f8] ms-3 flex items-center justify-center relative">
-                      <TbBell className="text-2xl" />
-                    </li>
-                  </Indicator>
-                </Menu.Target>
-                <Menu.Dropdown className="w-80">
-                  <Menu.Label>Notifications</Menu.Label>
-                  <Menu.Item>
-                    <CardNoti />
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
+              <Notify />
               <Menu shadow="md" width={200}>
                 <Menu.Target>
                   <li className="relative flex items-center justify-center w-10 h-10 ms-3">
