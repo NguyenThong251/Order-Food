@@ -4,13 +4,24 @@ import {
   Menu,
   Modal,
   NumberInput,
+  Swal,
   TbBell,
   TextInput,
   useEffect,
+  useForm,
   useState,
 } from "@repo/ui";
 import CardNoti from "./ui/CardNoti";
-import { Bill, Notification, Products, Table } from "../../../interface";
+import {
+  Bill,
+  CodeVoucher,
+  Notification,
+  OrderData,
+  Products,
+  Table,
+  User,
+  UserVoucher,
+} from "../../../interface";
 import request from "../../../utils/request";
 import { useRouter } from "next/navigation";
 
@@ -19,10 +30,19 @@ const Notify = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [currentNotification, setCurrentNotification] =
     useState<Notification | null>(null);
-  const [dataOrder, setDataOrder] = useState<Bill | null>(null);
+  const [dataOrder, setDataOrder] = useState<OrderData | null>(null);
   const [tableData, setTableData] = useState<Table | null>(null);
+  const [Discount, setDiscount] = useState<number | null>(null);
+  const [surcharge, setSurcharge] = useState<number | null>(null);
   const [productDetails, setProductDetails] = useState<Products[]>([]);
+  const [allVouchers, setAllVouchers] = useState<UserVoucher[]>([]);
   const router = useRouter();
+  const form = useForm({
+    initialValues: {
+      voucherCode: "",
+      surcharge: 0,
+    },
+  });
   const fetchDataNoti = async () => {
     try {
       const res = await request.get("/notify");
@@ -60,7 +80,6 @@ const Notify = () => {
     try {
       const res = await request.get(`/order/${orderId}`);
       setDataOrder(res.data);
-      console.log(res.data);
       await fetchTableData(res.data.table_id);
       await fetchProductDetails(res.data);
     } catch (err) {
@@ -79,8 +98,117 @@ const Notify = () => {
       console.error(err);
     }
   };
+  const fetchAllVouchers = async () => {
+    try {
+      const dataUser = await request.get("/users");
+      const allVouchers: UserVoucher[] = [];
+
+      dataUser.data.forEach((user: User) => {
+        if (user.vouchers) {
+          allVouchers.push(...user.vouchers);
+        }
+      });
+
+      setAllVouchers(allVouchers);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleVoucherSubmit = async (values: { voucherCode: string }) => {
+    try {
+      const matchedVoucher = allVouchers.find(
+        (voucher: UserVoucher) => voucher.code === values.voucherCode
+      );
+      if (matchedVoucher) {
+        const discountVoucher = await request.get(
+          `vouchers/${matchedVoucher?.voucher_id}`
+        );
+        const discount = discountVoucher.data.discount;
+        setDiscount(discount);
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Voucher add successful!",
+        });
+      } else {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+        Toast.fire({
+          icon: "error",
+          title: "Voucher is not valid",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleSurchargeSubmit = async (values: { surcharge: number }) => {
+    try {
+      setSurcharge(values.surcharge);
+      Swal.fire({
+        icon: "success",
+        title: "Surcharge add successful!",
+        timer: 3000,
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+      if (values.surcharge === 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Validation failed",
+          timer: 3000,
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timerProgressBar: true,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const calculateTotal = () => {
+    if (!dataOrder) return 0;
+
+    const subTotal = dataOrder.sub_total;
+    const discountAmount = Discount ? (subTotal * Discount) / 100 : 0;
+    const total = subTotal - discountAmount + (surcharge || 0);
+    return total;
+  };
+  const handlePayment = async () => {
+    const dataBill = {
+      order_id: dataOrder?._id,
+      discount: Discount,
+      surcharge: surcharge,
+      total: calculateTotal(),
+      date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    };
+    console.log(dataBill);
+  };
   useEffect(() => {
     fetchDataNoti();
+    fetchAllVouchers();
   }, []);
   return (
     <>
@@ -94,16 +222,17 @@ const Notify = () => {
         </Menu.Target>
         <Menu.Dropdown className="w-80">
           <Menu.Label>Notifications</Menu.Label>
-          <Menu.Item>
-            {dataNoti.map((item: Notification) => (
+
+          {dataNoti.map((item: Notification) => (
+            <Menu.Item>
               <CardNoti
                 key={item._id}
                 _id={item._id}
                 handleCheck={() => handleCheck(item)}
                 order_id={item.order_id}
-              />
-            ))}
-          </Menu.Item>
+              />{" "}
+            </Menu.Item>
+          ))}
         </Menu.Dropdown>
       </Menu>
       {currentNotification && dataOrder && tableData && (
@@ -158,27 +287,45 @@ const Notify = () => {
             <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
               Voucher
             </p>
-            <form className="flex justify-between gap-2">
-              <TextInput className="w-[70%] " />
-              <Button>Confirm</Button>
+
+            <form
+              className="flex justify-between gap-2"
+              onSubmit={form.onSubmit(handleVoucherSubmit)}
+            >
+              <TextInput
+                className="w-[70%]"
+                {...form.getInputProps("voucherCode")}
+              />
+              <Button type="submit">Confirm</Button>
             </form>
             <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
               Surcharge
             </p>
-            <div className="flex justify-between gap-2">
-              <NumberInput className="w-[70%] " />
-              <Button>Confirm</Button>
-            </div>
+            <form
+              className="flex justify-between gap-2"
+              onSubmit={form.onSubmit(handleSurchargeSubmit)}
+            >
+              <NumberInput
+                className="w-[70%]"
+                {...form.getInputProps("surcharge")}
+              />
+              <Button type="submit">Confirm</Button>
+            </form>
             <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Total: 123456 VNĐ
+              Discount: {Discount}%
             </p>
+            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+              Total Amount: {calculateTotal().toLocaleString()} VNĐ
+            </p>
+
             <Button
-              //   className={`py-2 text-md font-semibold text-center text-white rounded-lg ${
-              //     selectedBill.status === "Pending Payment"
-              //       ? "bg-red-400"
-              //       : "bg-green-400"
-              //   } dark:text-gray-300`}
-              className="w-full py-2 font-semibold text-center text-white bg-green-400 rounded-lg text-md hover:bg-green-600"
+              onClick={handlePayment}
+              disabled={dataOrder.status === "Paid"}
+              className={`w-full py-2 font-semibold text-center text-white rounded-lg text-md ${
+                dataOrder.status === "Paid"
+                  ? "bg-gray-400"
+                  : "bg-green-400 hover:bg-green-600"
+              }`}
             >
               {/* {selectedBill.status} */}
               Payment
