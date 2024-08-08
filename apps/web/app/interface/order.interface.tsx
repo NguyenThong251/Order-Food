@@ -4,10 +4,13 @@ export interface OrderProduct {
 }
 
 export interface OrderData {
+  _id: string;
   user_id: string | null;
   products: OrderProduct[];
   table_id: string;
   sub_total: number;
+  date: Date;
+  status: "Pending" | "Paid";
 }
 
 export interface OrderState {

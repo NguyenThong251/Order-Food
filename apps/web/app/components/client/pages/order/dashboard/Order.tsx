@@ -104,7 +104,7 @@ const Order: React.FC = () => {
       date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
     };
 
-    const orderData: OrderData = {
+    const orderData = {
       user_id: user ? user._id : null,
       products: items.map((item) => ({
         product_id: item.product_id,
@@ -112,6 +112,8 @@ const Order: React.FC = () => {
       })),
       table_id: tableId,
       sub_total: totalPrice,
+      status: "Pending",
+      date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
     };
     try {
       const Toast = Swal.mixin({
