@@ -36,6 +36,7 @@ const Notify = () => {
   const [surcharge, setSurcharge] = useState<number | null>(null);
   const [productDetails, setProductDetails] = useState<Products[]>([]);
   const [allVouchers, setAllVouchers] = useState<UserVoucher[]>([]);
+  const [userData, setUserData] = useState<User | null>(null);
   const router = useRouter();
   const form = useForm({
     initialValues: {
@@ -114,12 +115,38 @@ const Notify = () => {
       console.error(err);
     }
   };
+  const fetchUserByVoucher = async (
+    voucherCode: string
+  ): Promise<User | null> => {
+    try {
+      const resUser = await request.get("/users");
+      let matchedUser: User | null = null;
+      resUser.data.forEach((user: User) => {
+        if (user.vouchers) {
+          const matchedVoucher = user.vouchers.find(
+            (voucher: UserVoucher) => voucher.code === voucherCode
+          );
+          if (matchedVoucher) {
+            matchedUser = user;
+          }
+        }
+      });
+      return matchedUser;
+    } catch (err) {
+      return null;
+    }
+  };
   const handleVoucherSubmit = async (values: { voucherCode: string }) => {
     try {
+      const matchedUser = await fetchUserByVoucher(values.voucherCode);
       const matchedVoucher = allVouchers.find(
         (voucher: UserVoucher) => voucher.code === values.voucherCode
       );
-      if (matchedVoucher) {
+
+      if (matchedVoucher && matchedUser) {
+        await request.delete(
+          `/users/${matchedUser?._id}/voucher/${matchedVoucher?._id}`
+        );
         const discountVoucher = await request.get(
           `vouchers/${matchedVoucher?.voucher_id}`
         );
@@ -204,7 +231,31 @@ const Notify = () => {
       total: calculateTotal(),
       date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
     };
-    console.log(dataBill);
+    // console.log(dataBill);
+    try {
+      await request.put(`/order/${dataOrder?._id}`, {
+        ...dataOrder,
+        status: "Paid",
+      });
+      await request.put(`/notify/${currentNotification?._id}`, {
+        ...currentNotification,
+        isActive: false,
+      });
+      const res = await request.post("/bill", dataBill);
+      console.log(res.data);
+      Swal.fire({
+        icon: "success",
+        title: "Payment successful!",
+        timer: 3000,
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+      // router.push("/admin/invoice");
+    } catch (err) {
+      console.error(err);
+    }
   };
   useEffect(() => {
     fetchDataNoti();

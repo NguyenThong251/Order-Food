@@ -1,5 +1,6 @@
 export interface UserVoucher {
-  code: String;
+  _id: string;
+  code: string;
   voucher_id: string;
 }
 export interface User {
