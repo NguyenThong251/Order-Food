@@ -9,10 +9,12 @@ import {
   Swal,
   TbArrowsExchange,
   Text,
+  Textarea,
   TextInput,
   Title,
   useDisclosure,
   useEffect,
+  useForm,
   useState,
 } from "@repo/ui";
 import {
@@ -53,6 +55,13 @@ const Order: React.FC = () => {
     openedChangeTable,
     { open: openChangeTable, close: closeChangeTable },
   ] = useDisclosure(false);
+  const [opendOrder, { open: openOrder, close: closeOrder }] =
+    useDisclosure(false);
+  const form = useForm({
+    initialValues: {
+      noteorder: "",
+    },
+  });
   const fetchDataProducts = async () => {
     try {
       const res = await Promise.all(
@@ -86,13 +95,6 @@ const Order: React.FC = () => {
     open();
   };
 
-  // const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setPhone(event.target.value);
-  // };
-  // const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setName(event.target.value);
-  // };
-
   const handleOrder = async () => {
     const orderchefData: OrderChefData = {
       products: items.map((item) => ({
@@ -102,8 +104,8 @@ const Order: React.FC = () => {
       table_id: tableId,
       status: "pending",
       date: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+      note: form.values.noteorder,
     };
-
     const orderData = {
       user_id: user ? user._id : null,
       products: items.map((item) => ({
@@ -164,6 +166,7 @@ const Order: React.FC = () => {
         }
       }
       clearCart();
+      closeOrder();
     } catch (err) {
       console.error("Error ordering:", err);
     }
@@ -223,22 +226,6 @@ const Order: React.FC = () => {
                 />
               </div>
             ) : (
-              // user ? (
-              //   productData.flat().map((product: Products) => {
-              //     return (
-              //       <CardOrderItem
-              //         key={product._id}
-              //         product={product}
-              //         quantity={
-              //           cartDB.find((item) => item.product_id === product._id)
-              //             ?.quantity || 0
-              //         }
-              //         onRemove={removeItem}
-              //         onUpdateQuantity={updateItemQuantity}
-              //       />
-              //     );
-              //   })
-              // ) : (
               items.map((item) => {
                 const product = productData
                   .flat()
@@ -276,7 +263,8 @@ const Order: React.FC = () => {
         </Box>
         <Button
           disabled={!isInputFilled}
-          onClick={handleOrder}
+          // onClick={handleOrder}
+          onClick={openOrder}
           variant="filled"
           color="red"
           fullWidth
@@ -284,6 +272,28 @@ const Order: React.FC = () => {
         >
           Order
         </Button>
+        <Modal
+          opened={opendOrder}
+          onClose={closeOrder}
+          title="Note Order"
+          centered
+        >
+          <Textarea
+            key={form.key("noteorder")}
+            {...form.getInputProps("noteorder")}
+            className="mb-3"
+            label="Note"
+          />
+          <Button
+            onClick={handleOrder}
+            variant="filled"
+            color="red"
+            fullWidth
+            rightSection={<AiOutlineShoppingCart size={18} fontWeight={700} />}
+          >
+            Confirm Order
+          </Button>
+        </Modal>
       </Box>
     </>
   );

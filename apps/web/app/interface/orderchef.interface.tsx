@@ -7,4 +7,5 @@ export interface OrderChefData {
   table_id: string;
   status: "pending" | "completed" | "canceled";
   date: Date;
+  note: string;
 }
