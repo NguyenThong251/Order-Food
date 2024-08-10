@@ -25,12 +25,12 @@ export const Hero = () => {
         </div>
       </section>
       <div className="flex flex-col items-center justify-center gap-5 mt-3 sm:flex-row">
-        <Link href="./menu/category">
+        <Link href="/order/dashboard">
           <Button variant="filled" size="lg" w={250} color="red">
             Order Now
           </Button>
         </Link>
-        <Link href="./auth/login">
+        <Link href="/auth/login">
           <Button variant="outline" size="lg" w={250} color="red">
             Login to receive offers
           </Button>

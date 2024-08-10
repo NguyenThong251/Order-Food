@@ -78,7 +78,10 @@ const ProductModal: React.FC<ProductModalProps> = ({
         <Card>
           <Card.Section className="relative">
             <Image
-              src={product.thumbnails[currentIndex]}
+              src={
+                product.thumbnails[currentIndex] ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJRS-4chjWMRAmrtz7ivK53K_uygrgjzw9Uw&s"
+              }
               className="h-52"
               alt={product.name}
             />
