@@ -24,6 +24,7 @@ import {
 } from "../../../interface";
 import request from "../../../utils/request";
 import { useRouter } from "next/navigation";
+import PaymentDetailModal from "./modal/PaymentDetailModal";
 
 const Notify = () => {
   const [dataNoti, setDataNoti] = useState<Notification[]>([]);
@@ -252,6 +253,7 @@ const Notify = () => {
         showConfirmButton: false,
         timerProgressBar: true,
       });
+      setModalOpen(false);
       // router.push("/admin/invoice");
     } catch (err) {
       console.error(err);
@@ -287,103 +289,113 @@ const Notify = () => {
         </Menu.Dropdown>
       </Menu>
       {currentNotification && dataOrder && tableData && (
-        <Modal
-          opened={modalOpen}
-          onClose={() => setModalOpen(false)}
-          title="Payment Details"
-        >
-          {/* {selectedBill && tableData && ( */}
-          <div className="space-y-2 bg-white rounded-lg dark:bg-neutral-800">
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              {/* ID: {selectedBill._id} */}
-              ID: {dataOrder._id}
-            </p>
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              {/* Date: {new Date(selectedBill.date).toLocaleDateString()} */}
-              Date: {new Date(dataOrder.date).toLocaleDateString()}
-            </p>
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Table:{tableData.name}
-              {/* {tableData.name} */}
-            </p>
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Quantity:
-              {dataOrder.products.reduce(
-                (sum, product) => sum + product.quantity,
-                0
-              )}
-            </p>
-            <h3 className="font-bold text-gray-800 text-md dark:text-gray-200">
-              Products:
-            </h3>
-            <ul className="space-y-2">
-              {productDetails.map((product: Products) => (
-                <li
-                  key={product._id}
-                  className="flex justify-between p-2 bg-gray-100 rounded dark:bg-neutral-700"
-                >
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    {product.name}
-                  </span>
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    x {product.quantity}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Sub Total: {dataOrder.sub_total.toLocaleString()} VNĐ
-            </p>
-            {/* .toLocaleString() */}
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Voucher
-            </p>
+        // <Modal
+        //   opened={modalOpen}
+        //   onClose={() => setModalOpen(false)}
+        //   title="Payment Details"
+        // >
+        //   {/* {selectedBill && tableData && ( */}
+        //   <div className="space-y-2 bg-white rounded-lg dark:bg-neutral-800">
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       {/* ID: {selectedBill._id} */}
+        //       ID: {dataOrder._id}
+        //     </p>
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       {/* Date: {new Date(selectedBill.date).toLocaleDateString()} */}
+        //       Date: {new Date(dataOrder.date).toLocaleDateString()}
+        //     </p>
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       Table:{tableData.name}
+        //       {/* {tableData.name} */}
+        //     </p>
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       Quantity:
+        //       {dataOrder.products.reduce(
+        //         (sum, product) => sum + product.quantity,
+        //         0
+        //       )}
+        //     </p>
+        //     <h3 className="font-bold text-gray-800 text-md dark:text-gray-200">
+        //       Products:
+        //     </h3>
+        //     <ul className="space-y-2">
+        //       {productDetails.map((product: Products) => (
+        //         <li
+        //           key={product._id}
+        //           className="flex justify-between p-2 bg-gray-100 rounded dark:bg-neutral-700"
+        //         >
+        //           <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+        //             {product.name}
+        //           </span>
+        //           <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+        //             x {product.quantity}
+        //           </span>
+        //         </li>
+        //       ))}
+        //     </ul>
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       Sub Total: {dataOrder.sub_total.toLocaleString()} VNĐ
+        //     </p>
+        //     {/* .toLocaleString() */}
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       Voucher
+        //     </p>
 
-            <form
-              className="flex justify-between gap-2"
-              onSubmit={form.onSubmit(handleVoucherSubmit)}
-            >
-              <TextInput
-                className="w-[70%]"
-                {...form.getInputProps("voucherCode")}
-              />
-              <Button type="submit">Confirm</Button>
-            </form>
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Surcharge
-            </p>
-            <form
-              className="flex justify-between gap-2"
-              onSubmit={form.onSubmit(handleSurchargeSubmit)}
-            >
-              <NumberInput
-                className="w-[70%]"
-                {...form.getInputProps("surcharge")}
-              />
-              <Button type="submit">Confirm</Button>
-            </form>
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Discount: {Discount}%
-            </p>
-            <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-              Total Amount: {calculateTotal().toLocaleString()} VNĐ
-            </p>
+        //     <form
+        //       className="flex justify-between gap-2"
+        //       onSubmit={form.onSubmit(handleVoucherSubmit)}
+        //     >
+        //       <TextInput
+        //         className="w-[70%]"
+        //         {...form.getInputProps("voucherCode")}
+        //       />
+        //       <Button type="submit">Confirm</Button>
+        //     </form>
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       Surcharge
+        //     </p>
+        //     <form
+        //       className="flex justify-between gap-2"
+        //       onSubmit={form.onSubmit(handleSurchargeSubmit)}
+        //     >
+        //       <NumberInput
+        //         className="w-[70%]"
+        //         {...form.getInputProps("surcharge")}
+        //       />
+        //       <Button type="submit">Confirm</Button>
+        //     </form>
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       Discount: {Discount}%
+        //     </p>
+        //     <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
+        //       Total Amount: {calculateTotal().toLocaleString()} VNĐ
+        //     </p>
 
-            <Button
-              onClick={handlePayment}
-              disabled={dataOrder.status === "Paid"}
-              className={`w-full py-2 font-semibold text-center text-white rounded-lg text-md ${
-                dataOrder.status === "Paid"
-                  ? "bg-gray-400"
-                  : "bg-green-400 hover:bg-green-600"
-              }`}
-            >
-              {/* {selectedBill.status} */}
-              Payment
-            </Button>
-          </div>
-          {/* )} */}
-        </Modal>
+        //     <Button
+        //       onClick={handlePayment}
+        //       disabled={dataOrder.status === "Paid"}
+        //       className={`w-full py-2 font-semibold text-center text-white rounded-lg text-md ${
+        //         dataOrder.status === "Paid"
+        //           ? "bg-gray-400"
+        //           : "bg-green-400 hover:bg-green-600"
+        //       }`}
+        //     >
+        //       {/* {selectedBill.status} */}
+        //       Payment
+        //     </Button>
+        //   </div>
+        //   {/* )} */}
+        // </Modal>
+        <PaymentDetailModal
+          modalOpen={modalOpen}
+          setModalOpen={setModalOpen}
+          dataOrder={dataOrder}
+          tableData={tableData}
+          productDetails={productDetails}
+          currentNotification={currentNotification}
+          fetchAllVouchers={fetchAllVouchers}
+          allVouchers={allVouchers}
+        />
       )}
     </>
   );

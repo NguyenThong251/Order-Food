@@ -1,58 +1,67 @@
 "use client";
-import { Button, Modal, NumberInput, TextInput, useDisclosure } from "@repo/ui";
+import {
+  Button,
+  Modal,
+  NumberInput,
+  TextInput,
+  useDisclosure,
+  useEffect,
+  useState,
+} from "@repo/ui";
+import CardInvoice from "../../../../components/admin/components/ui/CardInvoice";
+import { OrderData } from "../../../../interface";
+import request from "../../../../utils/request";
 
 const page = () => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [dataOrder, setDataOrder] = useState<OrderData[]>([]);
+  const fetchDataOrder = async () => {
+    try {
+      const response = await request.get("/order");
+      setDataOrder(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataOrder();
+  }, []);
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Bill Details">
-        {/* {selectedBill && tableData && ( */}
+      {/* <Modal opened={opened} onClose={close} title="Bill Details">
         <div className="space-y-2 bg-white rounded-lg dark:bg-neutral-800">
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-            {/* ID: {selectedBill._id} */}
             ID: 123
           </p>
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
-            {/* Date: {new Date(selectedBill.date).toLocaleDateString()} */}
             Date: 11-2-2003
           </p>
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
             Table:Name
-            {/* {tableData.name} */}
           </p>
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
             Quantity: 2
-            {/* {selectedBill.products.reduce(
-              (sum, product) => sum + product.quantity,
-              0
-            )} */}
           </p>
           <h3 className="font-bold text-gray-800 text-md dark:text-gray-200">
             Products:
           </h3>
           <ul className="space-y-2">
-            {/* {productDetails.map((product: Products) => ( */}
-            <li
-              // key={product._id}
-              className="flex justify-between p-2 bg-gray-100 rounded dark:bg-neutral-700"
-            >
+            <li className="flex justify-between p-2 bg-gray-100 rounded dark:bg-neutral-700">
               <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                {/* {product.name} */}Name
+                Name
               </span>
               <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                {/* x {product.quantity} */}1
+                1
               </span>
             </li>
-            {/* ))} */}
           </ul>
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
             Sub Total: 123456 VNĐ
-            {/* Total: {selectedBill.total.toLocaleString()} VNĐ */}
           </p>
 
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
             Voucher
-            {/* Total: {selectedBill.total.toLocaleString()} VNĐ */}
           </p>
           <div className="flex justify-between gap-2">
             <TextInput className="w-[70%] " />
@@ -60,7 +69,6 @@ const page = () => {
           </div>
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
             Surcharge
-            {/* Total: {selectedBill.total.toLocaleString()} VNĐ */}
           </p>
           <div className="flex justify-between gap-2">
             <NumberInput className="w-[70%] " />
@@ -68,22 +76,12 @@ const page = () => {
           </div>
           <p className="font-semibold text-gray-700 text-md dark:text-gray-300">
             Total: 123456 VNĐ
-            {/* Total: {selectedBill.total.toLocaleString()} VNĐ */}
           </p>
-          <Button
-            //   className={`py-2 text-md font-semibold text-center text-white rounded-lg ${
-            //     selectedBill.status === "Pending Payment"
-            //       ? "bg-red-400"
-            //       : "bg-green-400"
-            //   } dark:text-gray-300`}
-            className="w-full py-2 font-semibold text-center text-white bg-green-400 rounded-lg text-md hover:bg-green-600"
-          >
-            {/* {selectedBill.status} */}
+          <Button className="w-full py-2 font-semibold text-center text-white bg-green-400 rounded-lg text-md hover:bg-green-600">
             Payment
           </Button>
         </div>
-        {/* )} */}
-      </Modal>
+      </Modal> */}
       <div className="p-4">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -98,7 +96,7 @@ const page = () => {
                 Date
               </th>
               <th className="px-6 py-3 font-medium tracking-wider text-left text-gray-500 uppercase text-md">
-                Total
+                Sub total
               </th>
               <th className="px-6 py-3 font-medium tracking-wider text-left text-gray-500 uppercase text-md">
                 Status
@@ -109,7 +107,17 @@ const page = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            <tr>
+            {dataOrder.map((item) => (
+              <CardInvoice
+                key={item._id}
+                _id={item._id}
+                table_id={item.table_id}
+                date={new Date(item.date).toLocaleDateString("vi-VN")}
+                sub_total={item.sub_total.toLocaleString()}
+                status={item.status}
+              />
+            ))}
+            {/* <tr>
               <td className="px-6 py-4 whitespace-nowrap">#123</td>
               <td className="px-6 py-4 whitespace-nowrap">A</td>
               <td className="px-6 py-4 whitespace-nowrap">11-01-1961</td>
@@ -132,7 +140,7 @@ const page = () => {
                   View
                 </button>
               </td>
-            </tr>
+            </tr> */}
             {/* <tr>
               <td className="px-6 py-4 whitespace-nowrap">#123</td>
               <td className="px-6 py-4 whitespace-nowrap">A</td>
